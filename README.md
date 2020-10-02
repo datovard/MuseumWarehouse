@@ -327,7 +327,7 @@ La máxima granularidad temporal en los datos utilizados es la anualidad, debido
 
 ##### Hechos
 
-A partir del objetivo principal del proyecto, se establece que la tabla de hechos será la tabla de **Espacios culturales y formación práctica** que ofrece la información de entrevistas respectivas al consumo de contenido en los sitios de interés mencionados. Se discriminan entonces las tablas que componen las entrevistas no relacionadas a estos sitios.
+A partir del objetivo principal del proyecto y de un análisis de las relaciones entre los componentes de las entrevistas se llega a la conclusión de que la tabla de hechos estará compuesta por las Características Generales del entrevistado, conteniendo relaciones importantes para solucionar cada uno de los intereses del proyecto.
 
 ##### Dimensiones
 
@@ -340,3 +340,7 @@ Las dimensiones en este proyecto estarán compuestas por:
 * Niños de 5 a 11 espacios culturales y formación práctica.
 
 Las cuales complementan la tabla de hechos sumando datos importantes para los objetivos particulares como el análisis socio-económico y la demografía.
+
+#### Diagrama
+
+![alt text](./misc/warehouse-model.PNG "Sakila diagram")
