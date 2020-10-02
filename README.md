@@ -335,12 +335,13 @@ Las dimensiones en este proyecto estarán compuestas por:
 
 * Viviendas
 * Hogares
-* Características generales
 * Presentaciones y espectáculos
+* Espacios culturales y formación práctica.
 * Niños de 5 a 11 espacios culturales y formación práctica.
 
 Las cuales complementan la tabla de hechos sumando datos importantes para los objetivos particulares como el análisis socio-económico y la demografía.
 
 #### Diagrama
 
-![alt text](./misc/warehouse-model.PNG "Sakila diagram")
+![alt text](./misc/warehouse-model.png "Warehouse")
+
