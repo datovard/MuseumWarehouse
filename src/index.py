@@ -1,9 +1,16 @@
-import pandas as pd
-import plotly.express as px
+from etl.ETL1 import ETL1
+from etl.ETL2 import ETL2
+from etl.ETL3 import ETL3
+from etl.ETL4 import ETL4
 
-#df = pd.read_csv('../config/db/src/Museos_Ciudad_de_Bogot.csv')
+etl1 = ETL1()
+etl1.startETL1()
 
-print("llega")
+etl2 = ETL2()
+etl2.startETL2()
 
-#fig = px.line(df, x = 'AAPL_x', y = 'AAPL_y', title='Apple Share Prices over time (2014)')
-#fig.show()
+etl3 = ETL3()
+etl3.startETL3()
+
+etl4 = ETL4()
+etl4.startETL4()

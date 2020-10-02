@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  mysql-target:
+    build:
+      dockerfile: ./config/docker/mysql-target.Dockerfile
+      context: .
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    volumes:
+      - mysql-target-data:/var/lib/mysql
+    ports: 
+      - "33060:3306"
+volumes:
+  mysql-target-data:

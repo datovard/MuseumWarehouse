@@ -49,7 +49,7 @@ El enfoque principal de este proyecto está basado en los eventos en ubicaciones
 * Monumentos nacionales
 * Centros históricos
 
-Esto nos lleva a analizar los datos que queremos extraer de la fuente de datos. Tomando como referencia la estructura de tablas y datos para la encuesta del año 2017 por lo que se escogen las siguientes tablas:
+Esto nos lleva a analizar los datos que queremos extraer de la fuente de datos. Tomando como referencia la estructura de tablas y datos para la encuesta del año 2017 y se busca la información respectiva por cada un de los años anteriores (2016, 2014 y 2012). Por lo que se escogen las siguientes tablas:
 
 | Tabla 	| Razón 	|
 |-	|-	|
@@ -58,7 +58,6 @@ Esto nos lleva a analizar los datos que queremos extraer de la fuente de datos. 
 | Características generales 	| Ofrece un perfil socio-económico (como el nivel de estudios, identificación cultural y género) de cada persona que puedan ser relacionadas con las demás variables 	|
 | Presentaciones y espectáculos 	| Ofrece un vistazo del consumo de contenido cultural en distintar presentaciones y distintos lugares, por lo que se escogerán sólo las variables que están involucradas con los sitios previamente mencionados 	|
 | Espacios culturales y formacion practica 	| Ofrece un vistazo sobre el uso de espacios culturales, se escogerán las variables que estén relacionadas con los sitios culturales previamente mencionados 	|
-| Niños de 5 a 11, presentaciones y espectáculos, publicaciones y audiovisuales 	| Ofrece un vistazo sobre el contenido cultural consumido por niños entre 5 a 11 años, se incluirán únicamente las variables relacionadas al contenido de los sitios culturales previamente definidos 	|
 | Niños de 5 a 11 espacios culturales y formacion practica. 	| Ofrece datos sobre los espacios culturales que los niños de 5 a 11 años frecuentan, se incluirán únicamente las variables relacionadas al contenido y sitios culturales previamente definidos 	|
 
 Se debe tener en cuenta la diferencia de cantidades de variables como se describe en el punto anterior y cuáles son estas variables que no concuerdan, por lo que se obtienen las siguientes variables:
@@ -256,3 +255,75 @@ Se debe tener en cuenta la diferencia de cantidades de variables como se describ
 | P5458S1A7 	| ¿Usted tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses? ¿En qué área?:<br>   - g. Artesanías 	| Si 	| Si 	| Si 	| Si 	|
 | P5458S1A8 	| ¿Usted tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses? ¿En qué área?:<br>   - h. Manualidades 	| Si 	| Si 	| Si 	| Si 	|
 | P5458S1A9 	| ¿Usted tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses? ¿En qué área?:<br>   - i. Otra área 	| Si 	| Si 	| Si 	| Si 	|
+
+**Niños de 5 a 11 espacios culturales y formacion practica**
+
+| Nombre 	| Etiqueta 	| 2017 	| 2016 	| 2014 	| 2012 	|
+|-	|-	|-	|-	|-	|-	|
+| DIRECTORIO 	| Consecutivo por vivienda es único 	| Si 	| Si 	| Si 	| Si 	|
+| NRO_ENCUESTA 	| Corresponde a la tabla en que se cargo la informacion<br>(233=vivienda,<br>234=hogar,<br>235=personas) 	| Si 	| Si 	| Si 	| Si 	|
+| HOGAR_NUMERO 	| Número del Hogar 	| Si 	| Si 	| Si 	| Si 	|
+| PERSONA_NUMERO 	| Número de la persona dentro del hogar 	| Si 	| Si 	| Si 	| Si 	|
+| P5485 	| ¿El niño o la niña asistió a bibliotecas en los últimos 12 meses? 	| Si 	| Si 	| Si 	| Si 	|
+| P5485S1 	| ¿El niño o la niña asistió a bibliotecas en los últimos 12 meses? <br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5486 	| En los últimos 12 meses, ¿el niño o la niña visitó casas de la cultura?  	| Si 	| Si 	| Si 	| Si 	|
+| P5486S1 	| En los últimos 12 meses, ¿el niño o la niña visitó casas de la cultura? <br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5487 	| ¿el niño o la niña asistió a centros culturales en los últimos 12 meses?  	| Si 	| Si 	| Si 	| Si 	|
+| P5487S1 	| ¿el niño o la niña asistió a centros culturales en los últimos 12 meses? <br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5488 	| En los últimos 12 meses, ¿el niño o la niña visitó museos? 	| Si 	| Si 	| Si 	| Si 	|
+| P5488S1 	| En los últimos 12 meses, ¿el niño o la niña visitó museos?<br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5489 	| ¿El niño o la niña asistió a galerías de arte y salas de exposiciones en los últimos 12 meses? 	| Si 	| Si 	| Si 	| Si 	|
+| P5489S1 	| ¿El niño o la niña asistió a galerías de arte y salas de exposiciones en los últimos 12 meses?<br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5490 	| En los últimos 12 meses, ¿el niño o la niña visitó monumentos históricos, sitios arqueológicos, monumentos nacionales o centros históricos? 	| Si 	| Si 	| Si 	| Si 	|
+| P5490S1 	| En los últimos 12 meses, ¿el niño o la niña visitó monumentos históricos, sitios arqueológicos, monumentos nacionales o centros históricos?<br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5491 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses? 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S1 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - a. Cine, televisión, radio, video 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S2 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - b. Música 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S3 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - c. Teatro, ópera o danza 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S4 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - d. Cuentería o títeres 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S5 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - e. Fotografía, pintura, grabados, dibujos, escultura o artes gráficas 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S6 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - f. Literatura (cuento, narrativa, novela, poesía) o prensa (redacción, géneros periodísticos, revistas, periódicos, magazines digitales o impresos) 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S7 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - g. Artesanías 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S8 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - h. Manualidades 	| Si 	| Si 	| Si 	| Si 	|
+| P5492S9 	| ¿El niño o la niña tomó cursos o talleres en áreas artísticas y culturales en los últimos 12 meses?<br>   ¿En qué área?:<br>      - i. Otra área 	| Si 	| Si 	| Si 	| Si 	|
+| P5494 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural? 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S1 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - a. Hizo videos, produjo radio, realizó televisión o participó en producciones de cine 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S2 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - b. Tocó algún instrumento, compuso o cantó 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S3 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - c. Hizo teatro, practicó danza, participó en ópera 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S4 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - d. Hizo títeres, participó en cuentería 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S5 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - e. Tomó fotos, pintó, hizo alguna escultura y/o grabado, realizó algún dibujo o arte gráfica 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S6 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - f. Escribió textos literarios(cuentos, novelas, poesías) o periodísticos para revistas, periódicos, magazines, blogs 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S7 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - g. Realizó algún tipo de artesanía 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S8 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - h. Elaboró alguna manualidad 	| Si 	| Si 	| Si 	| Si 	|
+| P5495S9 	| En los últimos 12 meses, ¿el niño o la niña hizo alguna práctica cultural?<br>   ¿Qué práctica cultural realizó?:<br>      - i. Otra práctica cultural 	| Si 	| Si 	| Si 	| Si 	|
+| P5497 	| ¿El niño o la niña usóinternet en los últimos 3 meses?(en cualquier lugar) 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A1 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - a. Buscar, descargar o escuchar música en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A2 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - b. Ver televisión o escuchar radio en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A3 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - c. Buscar, descargar o leer revistas y periódicos en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A4 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - d. Visitar o acceder a servicios en línea en espacios culturales virtuales (bibliotecas virtuales, museos, galerías) 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A5 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - e. Buscar, descargar o leer libros en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A6 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - f. Buscar, descargar o jugar videojuegos en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5497S1A7 	| ¿El niño o la niña usó internet en los últimos 3 meses? (en cualquier lugar)<br>   Cuando usó internet, ¿lo utilizó para alguna de las siguientes actividades?:<br>       - g. Buscar, descargar o ver películas y/o videos en línea 	| Si 	| Si 	| Si 	| Si 	|
+| P5498 	| ¿el niño o la niña desarrolló alguna actividad lúdica o de juego en los últimos 12 meses? 	| Si 	| Si 	| Si 	| Si 	|
+| P5498S1 	| ¿el niño o la niña desarrolló alguna actividad lúdica o de juego en los últimos 12 meses?<br>   - a. ¿con qué frecuencia? 	| Si 	| Si 	| Si 	| Si 	|
+| P5499S1 	| ¿con quiénes realizó actividades lúdicas o de juego el niño o la niña?<br>   - a. Con su familia 	| Si 	| Si 	| Si 	| Si 	|
+| P5499S2 	| ¿con quiénes realizó actividades lúdicas o de juego el niño o la niña?<br>   - b. Con los amigos o compañeros de estudio 	| Si 	| Si 	| Si 	| Si 	|
+| P5499S3 	| ¿con quiénes realizó actividades lúdicas o de juego el niño o la niña?<br>   - c. Lo hizo solo(a) 	| Si 	| Si 	| Si 	| Si 	|
+
+### Diseño del modelo multidimensional de datos
+
+#### Objetivos
+
+Se debe recordar que el objetivo principal del proyecto es el análisis de consumo de contenido cultural en sitios físicos del país. Esto define los siguientes objetivos particulares:
+
+1. Analizar los gustos de contenido cultural de la población bogotana
+2. Analizar la relación de las condiciones socio-económicas y demográficas del consumo de contenido cultural
+3. Analizar el interés y la asistencia a sitios culturales como museos, galerias de arte, bibliotecas, monumentos históricos, etc.
+4. Descubrir contenido cultural que esté fomentando el incremento de consumo cultural.
+
+#### Temporalidad
+
+La máxima granularidad temporal en los datos utilizados es la anualidad, debido a que la realización de la encuesta de consumo es anualmente (2012, 2014, 2016 y 2017) y se presentan años en los que no ha sido realizada (2013, 2015).
+
+
+
