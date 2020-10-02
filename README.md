@@ -176,15 +176,6 @@ Se debe tener en cuenta la diferencia de cantidades de variables como se describ
 | P207S8 	| Usted no asistió a ferias o exposiciones artesanales por:<br>   - h. Otro 	| Si 	| Si 	| Si 	| Si 	|
 | P5377 	| ¿Pagó usted por entradas a ferias o exposiciones artesanales en los últimos 12 meses? 	| Si 	| Si 	| Si 	| Si 	|
 | P5377S1 	| ¿Pagó usted por entradas a ferias o exposiciones artesanales en los últimos 12 meses?<br>   - a. ¿cuánto pagó? 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S1 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - a. Ferias taurinas, novilladas, becerradas, coleo o corralejas 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S2 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - b. Festivales, ferias de publicaciones (libros) o audiovisuales (cine, televisión, radio y video) 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S3 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - c. Carnavales, fiestas o eventos nacionales 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S4 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - d. Vio títeres o escuchó cuenteros 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S5 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - e. Visitó parques, reservas naturales o zoológicos 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S6 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - f. Festivales gastronómicos 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S7 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - g. Fiestas municipales o departamentales 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S8 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - h. Fue al circo 	| Si 	| Si 	| Si 	| Si 	|
-| P5378S9 	| En los últimos 12 meses, ¿asistió a las siguientes actividades culturales?<br>   - i. Asistió a parques temáticos o de diversiones 	| Si 	| Si 	| Si 	| Si 	|
 
 
 **Espacios culturales y formacion practica**
@@ -314,9 +305,16 @@ Se debe tener en cuenta la diferencia de cantidades de variables como se describ
 
 #### Objetivos
 
-Se debe recordar que el objetivo principal del proyecto es el análisis de consumo de contenido cultural en sitios físicos del país. Esto define los siguientes objetivos particulares:
+##### Principal
 
-1. Analizar los gustos de contenido cultural de la población bogotana
+Se debe recordar que el objetivo principal del proyecto es: <br><br>
+El análisis de consumo de contenido cultural en sitios físicos del país.
+
+##### Particulares
+
+Esto define los siguientes objetivos particulares:
+
+1. Analizar los gustos de contenido cultural de la población entrevistada
 2. Analizar la relación de las condiciones socio-económicas y demográficas del consumo de contenido cultural
 3. Analizar el interés y la asistencia a sitios culturales como museos, galerias de arte, bibliotecas, monumentos históricos, etc.
 4. Descubrir contenido cultural que esté fomentando el incremento de consumo cultural.
@@ -325,5 +323,20 @@ Se debe recordar que el objetivo principal del proyecto es el análisis de consu
 
 La máxima granularidad temporal en los datos utilizados es la anualidad, debido a que la realización de la encuesta de consumo es anualmente (2012, 2014, 2016 y 2017) y se presentan años en los que no ha sido realizada (2013, 2015).
 
+#### Dimensionalidad y Hechos
 
+##### Hechos
 
+A partir del objetivo principal del proyecto, se establece que la tabla de hechos será la tabla de **Espacios culturales y formación práctica** que ofrece la información de entrevistas respectivas al consumo de contenido en los sitios de interés mencionados. Se discriminan entonces las tablas que componen las entrevistas no relacionadas a estos sitios.
+
+##### Dimensiones
+
+Las dimensiones en este proyecto estarán compuestas por:
+
+* Viviendas
+* Hogares
+* Características generales
+* Presentaciones y espectáculos
+* Niños de 5 a 11 espacios culturales y formación práctica.
+
+Las cuales complementan la tabla de hechos sumando datos importantes para los objetivos particulares como el análisis socio-económico y la demografía.
