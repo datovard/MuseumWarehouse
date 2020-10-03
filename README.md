@@ -341,7 +341,8 @@ Las dimensiones en este proyecto estarán compuestas por:
 
 Las cuales complementan la tabla de hechos sumando datos importantes para los objetivos particulares como el análisis socio-económico y la demografía.
 
+### 4. Modelo Multidimensional
+
 #### Diagrama
 
 ![alt text](./misc/warehouse-model.png "Warehouse")
-
