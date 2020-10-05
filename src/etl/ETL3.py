@@ -1,43 +1,90 @@
-from connections.SourceConnection import SourceConnection
 from connections.TargetConnection import TargetConnection
 
+import savReaderWriter
+import numpy as np
+
 class ETL3:
-    sourceConnection: None
     targetConnection: None
 
+    definirSexo = {
+        "1": "Hombre",
+        "2": "Mujer"
+    }
+
+    definirCultura = {
+        "1": "¿Indigena?",
+        "2": "¿Gitano (a), rom?",
+        "3": "¿Raizal del archipielago de San And´res, Provediencia y Santa Catalina?",
+        "4": "¿Palenquero(a) de San Basilio o descendiente?",
+        "5": "¿Negro(a), mulato(a), afrocolombiano(a) o afrodescendiente?",
+        "6": "¿Mestizo(a)?",
+        "7": "¿Blanco(a)?",
+        "8": "¿Otro?",
+        "99": "No sabe/no informa",
+        "Null": "Null"
+    }
+
+    definirParentezco = {
+        "1": "Jefe(a) del hogar",
+        "2": "Pareja, esposo(a), cónyuge, compañero(a)",
+        "3": "Hijo(a) o hijastro(a)",
+        "4": "Nieto(a)",
+        "5": "Otro pariente",
+        "6": "Empleado(a) del servicio doméstico y sus parientes",
+        "7": "Pensionista, compañero(a) del pensionista",
+        "8": "Trabajador",
+        "9": "Otro no pariente",
+        "Null": "Null"
+    }
+    
+    respuestaBooleana = {
+            "1": "Si",
+            "2": "No",
+            "3": "No sabe/no responde",
+            "Null": "Null"
+        }
+    
+    definirEstudios = {
+        "1": "Ninguno",
+        "2": "Presscolar",
+        "3": "Básica Primaria (1°-5°)",
+        "4": "Básica Secundaria (6°-9°)",
+        "5": "Media (10°-13°)",
+        "6": "Superior (Técnica, Tecnológica, Universitaria - pregrado)",
+        "7": "Posgrado (especialización, maestría, doctorado)",
+        "8": "No sabe/No informa",
+        "Null": "Null"
+    }
+
     def __init__(self):
-        self.sourceConnection = SourceConnection()
         self.targetConnection = TargetConnection()
     
     def startETL3(self):
-        self.startTransformationsAndLoads()
+        self.cargarAnio2012()
     
-    def startTransformationsAndLoads(self):
-        query_count = "SELECT COUNT(*) FROM rental WHERE return_date IS NULL;"
-        
-        count = self.sourceConnection.runQuery(query_count)
-        row_count = count[0][0]
-        rounds = int(row_count/1000) + 1
+    def cargarAnio2012(self):
+        filepath = "./Encuesta/2012/Caracteristicas_generales/Características generales.sav"
 
-        for i in range(0, rounds):
-            query_costs = """
-            SELECT COUNT(rental.rental_id) as total_copies_lost, film.title, SUM(payment.amount) as total_rental_lost, SUM(film.replacement_cost) as total_replacement_cost
-                FROM rental 
-                LEFT JOIN inventory ON(rental.inventory_id = inventory.inventory_id)
-                LEFT JOIN film ON(inventory.film_id = film.film_id)
-                LEFT JOIN payment ON(rental.rental_id = payment.payment_id)
-                WHERE return_date IS NULL
-                GROUP BY film.title, film.special_features ORDER BY total_copies_lost DESC, total_replacement_cost DESC;"""
-            
-            costs = self.sourceConnection.runQuery(query_costs)
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-            for cost in costs:
-                query_insert = "INSERT INTO money_lost_on_rentals (total_copies_lost, title, total_rental_lost, total_replacement_cost) VALUES "
-                query_insert += "(" + str(cost[0]) + ", '" + cost[1] + "', " + str(cost[2]) + ", " + str(cost[3]) + ")"
+                query = ("INSERT INTO CaracteristicasGenerales " +
+                        " ( ID_HOGAR, P6020, P5785, P5465, P5501, P6160, P6170, P260, P261 ) " +
+                        "values (" +
+                        "1" + # ID_HOGAR
+                        self.definirSexo[line[6]] + ", " + # P6020
+                        line[9] + ", " + # P5785
+                        self.definirCultura[line[10]] + ", " + # P5465
+                        self.definirParentezco[line[11]] + ", " + # P5501
+                        self.respuestaBooleana[line[13]] + ", " + # P6160
+                        self.respuestaBooleana[line[14]] + ", " + # P6170
+                        self.definirEstudios[line[15]] + ", " + # P260
+                        line[16] + # P261
+                        ");")
 
-                self.targetConnection.runQuery(query_insert)
-
-                self.targetConnection.commitChanges()
+                print(line)
 
 
     

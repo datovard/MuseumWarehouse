@@ -164,5 +164,5 @@ class ETL1:
                 self.runQuery(query)
     
     def runQuery(self, query):
-        results = self.targetConnection.runQuery(query)
+        results = self.targetConnection.runQueryWithoutReturn(query)
         self.targetConnection.commitChanges()

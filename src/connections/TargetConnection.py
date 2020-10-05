@@ -27,19 +27,26 @@ class TargetConnection:
         if (self.connection.is_connected()):
             self.connection.close()
 
-    def runQuery(self, query):
+    def runQueryWithReturn(self, query):
         cursor = self.connection.cursor()
 
         cursor.execute(query)
 
-        if cursor.rowcount <= 0:
-            result = cursor.fetchall()
-        else:
-            result = None
+        result = cursor.fetchall()
 
         cursor.close()
 
         return result
+    
+
+    def runQueryWithoutReturn(self, query):
+        cursor = self.connection.cursor()
+
+        cursor.execute(query)
+
+        cursor.close()
+
+        return None
     
     def commitChanges(self):
         self.connection.commit()
