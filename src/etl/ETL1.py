@@ -1,54 +1,168 @@
-from connections.SourceConnection import SourceConnection
 from connections.TargetConnection import TargetConnection
 
+
+import savReaderWriter
+import numpy as np
+
 class ETL1:
-    sourceConnection: None
     targetConnection: None
 
+    condicionVivienda = {
+        "1": "Ocupada",
+        "2": "Vacante/desocupada",
+        "3": "Otra"
+    }
+
+    regionNames = {
+            "1": "Bogotá",
+            "2": "Atlantica",
+            "3": "Oriental",
+            "4": "Central",
+            "5": "Pacifica",
+            "6": "Amazonía/Orinoquia"
+        }
+    
+    tipoViviendas = {
+            "1": "Casa",
+            "2": "Apartamento",
+            "3": "Cuarto(s) en inquilinato",
+            "4": "Cuarto(s) en otro tipo de estructura",
+            "5": "Vivienda indígena",
+            "6": "Otra vivienda (carpa, vagón, embarcación, cueva, refugio natural, etc.)"
+        }
+    
+    estratoTarifa = {
+        "0": "0 (conexión ilegal - pirata)",
+        "1": "Estrato 1",
+        "2": "Estrato 2",
+        "3": "Estrato 3",
+        "4": "Estrato 4",
+        "5": "Estrato 5",
+        "6": "Estrato 6",
+        "9": "(planta eléctrica o no se puede establecer el estrato)",
+        "Null": "Null"
+    }
+    
+    respuestaBooleana = {
+            "1": "Si",
+            "2": "No",
+            "3": "No sabe/no responde",
+            "Null": "Null"
+        }
+
     def __init__(self):
-        self.sourceConnection = SourceConnection()
         self.targetConnection = TargetConnection()
     
     def startETL1(self):
-        self.startTemporalDatabases()
-        self.startTransformationsAndLoads()
+        self.cargarAnio2012()
+        self.cargarAnio2014()
+        self.cargarAnio2016()
+        self.cargarAnio2017()
     
-    def startTemporalDatabases(self):
-        query = """
-        CREATE TEMPORARY TABLE rents_by_category_city_and_year
-        (SELECT COUNT(rental.rental_date) as rental, YEAR(rental.rental_date)as year, category.name as category, city.city as city
-            FROM rental 
-            LEFT JOIN inventory ON(rental.inventory_id = inventory.inventory_id)
-            LEFT JOIN film ON (inventory.film_id = film.film_id)
-            LEFT JOIN film_category ON (film.film_id = film_category.film_id)
-            LEFT JOIN category ON (film_category.category_id = category.category_id)
-            LEFT JOIN customer ON (rental.customer_id = customer.customer_id)
-            LEFT JOIN address ON ( customer.address_id = address.address_id )
-            LEFT JOIN city ON (address.city_id = city.city_id)
-            GROUP BY city, category, year ORDER BY city ASC, year DESC, rental DESC);"""
+    def cargarAnio2012(self):
+        filepath = "./Encuesta/2012/Tabla_de_viviendas/Tabla de vivendas.sav"
 
-        self.sourceConnection.runQuery(query)
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None) else "Null" , line))
 
-    def startTransformationsAndLoads(self):
-        query = "SELECT COUNT(*) FROM rents_by_category_city_and_year;"
+                query = ("INSERT INTO Vivienda " +
+                        " ( Directorio, Region, P4090, P4000, P4031S1, P4031S1A1, P4031S2, P4031S3, P4031S4, P4031S4A1, P4031S5, P70 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " +
+                        "\"" + self.regionNames[line[2]] + "\", " +
+                        "NULL, " +
+                        "\"" + self.tipoViviendas[line[6]] + "\", " +
+                        "\"" + self.respuestaBooleana[line[7]] + "\", " +
+                        "\"" + self.estratoTarifa[line[8]] + "\", " +
+                        "\"" + self.respuestaBooleana[line[9]] + "\", " +
+                        "\"" + self.respuestaBooleana[line[10]] + "\", " +
+                        "\"" + self.respuestaBooleana[line[11]] + "\", " +
+                        line[12] + ", " +
+                        "\"" + self.respuestaBooleana[line[13]] + "\", " +
+                        "NULL " +
+                        ")")
+                self.runQuery(query)
+    
+    def cargarAnio2014(self):
+        filepath = "./Encuesta/2014/Viviendas/VIVIENDAS.sav"
 
-        results = self.sourceConnection.runQuery(query)
-        row_count = results[0][0]
-        rounds = int(row_count/1000) + 1
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None) else "Null" , line))
 
-        for i in range(0, rounds):
-            query = "SELECT MAX(rental) as rental, city, year FROM rents_by_category_city_and_year GROUP BY year, city ORDER BY city ASC, year DESC"
-            query += " LIMIT " + str(i * 1000) + ", 1000"
+                query = ("INSERT INTO Vivienda " +
+                        " ( Directorio, Region, P4090, P4000, P4031S1, P4031S1A1, P4031S2, P4031S3, P4031S4, P4031S4A1, P4031S5, P70 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        "\"" + self.regionNames[line[2]] + "\", " + # Region
+                        "\"" + self.condicionVivienda[line[4]] + "\"," + # P4090
+                        "\"" + self.tipoViviendas[line[5]] + "\", " + # P4000
+                        "\"" + self.respuestaBooleana[line[6]] + "\", " + #P4031S1
+                        "\"" + self.estratoTarifa[line[7]] + "\", " + # P4031S1A1
+                        "\"" + self.respuestaBooleana[line[8]] + "\", " + # P4031S2
+                        "\"" + self.respuestaBooleana[line[9]] + "\", " + # P4031S3
+                        "\"" + self.respuestaBooleana[line[10]] + "\", " + # P4031S4
+                        line[11] + ", " + #P4031S4A1
+                        "\"" + self.respuestaBooleana[line[12]] + "\", " + # P4031S5
+                        line[13] + # P70
+                        ")")
+                self.runQuery(query)
 
-            results = self.sourceConnection.runQuery(query)
-            
-            for j in results:
-                query_category = "SELECT category FROM rents_by_category_city_and_year WHERE year = " + str(j[2]) + " AND city = '" + j[1] + "' AND rental = "+ str(j[0]) +";"
-                
-                categories = self.sourceConnection.runQuery(query_category)
+    def cargarAnio2016(self):
+        filepath = "./Encuesta/2016/Viviendas/Viviendas.sav"
 
-                for category in categories:
-                    query_insert = "INSERT INTO rents_by_category_city_and_year (rental, year, category, city) VALUES ("+str(j[0])+", "+str(j[2])+", '"+category[0]+"', '"+j[1]+"' )"
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None) else "Null" , line))
 
-                    self.targetConnection.runQuery(query_insert)
-                    self.targetConnection.commitChanges()
+                query = ("INSERT INTO Vivienda " +
+                        " ( Directorio, Region, P4090, P4000, P4031S1, P4031S1A1, P4031S2, P4031S3, P4031S4, P4031S4A1, P4031S5, P70 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        "\"" + self.regionNames[line[2]] + "\", " + # Region
+                        "\"" + self.condicionVivienda[line[3]] + "\"," + # P4090
+                        "\"" + self.tipoViviendas[line[4]] + "\", " + # P4000
+                        "\"" + self.respuestaBooleana[line[5]] + "\", " + #P4031S1
+                        "\"" + self.estratoTarifa[line[6]] + "\", " + # P4031S1A1
+                        "\"" + self.respuestaBooleana[line[7]] + "\", " + # P4031S2
+                        "\"" + self.respuestaBooleana[line[8]] + "\", " + # P4031S3
+                        "\"" + self.respuestaBooleana[line[9]] + "\", " + # P4031S4
+                        line[10] + ", " + #P4031S4A1
+                        "\"" + self.respuestaBooleana[line[11]] + "\", " + # P4031S5
+                        line[12] + # P70
+                        ")")
+                self.runQuery(query)
+    
+    def cargarAnio2017(self):
+        filepath = "./Encuesta/2017/Viviendas/Viviendas.sav"
+
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+
+                query = ("INSERT INTO Vivienda " +
+                        " ( Directorio, Region, P4090, P4000, P4031S1, P4031S1A1, P4031S2, P4031S3, P4031S4, P4031S4A1, P4031S5, P70 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        "\"" + self.regionNames[line[2]] + "\", " + # Region
+                        "\"" + self.condicionVivienda[line[3]] + "\"," + # P4090
+                        "\"" + self.tipoViviendas[line[4]] + "\", " + # P4000
+                        "\"" + self.respuestaBooleana[line[5]] + "\", " + #P4031S1
+                        "\"" + self.estratoTarifa[line[6]] + "\", " + # P4031S1A1
+                        "\"" + self.respuestaBooleana[line[7]] + "\", " + # P4031S2
+                        "\"" + self.respuestaBooleana[line[8]] + "\", " + # P4031S3
+                        "\"" + self.respuestaBooleana[line[9]] + "\", " + # P4031S4
+                        line[10] + ", " + #P4031S4A1
+                        "\"" + self.respuestaBooleana[line[11]] + "\", " + # P4031S5
+                        line[12] + # P70
+                        ")")
+                self.runQuery(query)
+    
+    def runQuery(self, query):
+        results = self.targetConnection.runQuery(query)
+        self.targetConnection.commitChanges()

@@ -301,7 +301,7 @@ Se debe tener en cuenta la diferencia de cantidades de variables como se describ
 | P5499S2 	| ¿con quiénes realizó actividades lúdicas o de juego el niño o la niña?<br>   - b. Con los amigos o compañeros de estudio 	| Si 	| Si 	| Si 	| Si 	|
 | P5499S3 	| ¿con quiénes realizó actividades lúdicas o de juego el niño o la niña?<br>   - c. Lo hizo solo(a) 	| Si 	| Si 	| Si 	| Si 	|
 
-### Diseño del modelo multidimensional de datos
+### 4. Análisis de requerimientos y pasos par construir modelo multidimensional
 
 #### Objetivos
 
@@ -341,8 +341,18 @@ Las dimensiones en este proyecto estarán compuestas por:
 
 Las cuales complementan la tabla de hechos sumando datos importantes para los objetivos particulares como el análisis socio-económico y la demografía.
 
-### 4. Modelo Multidimensional
+### 5. Modelo Multidimensional
 
 #### Diagrama
 
 ![alt text](./misc/warehouse-model.png "Warehouse")
+
+### 5. ETL's y llenado de datos
+
+Para el proceso de migración y llenado de datos se analiza el formato en el que está almacenada cada entrevista por cada uno de los años.
+
+Para el año 2017 se almacenó la información en un formato CSV, para los años anteriores se realiza la lectura a partir de archivos .txt
+
+**Vivienda**
+
+**2012**: Se seleccionan las variables disponibles y se limpian los datos, hay datos faltantes que se completan con "No sabe/no responde"
