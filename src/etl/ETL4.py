@@ -1,166 +1,128 @@
-import json
-from connections.SourceConnection import SourceConnection
 from connections.TargetConnection import TargetConnection
-import http.client
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+
+import savReaderWriter
+import numpy as np
 
 class ETL4:
-    sourceConnection: None
     targetConnection: None
-    imdbConnection: None
-    imdbHeaders: None
-    availableEndpoints: {}
-    categories: []
+
+    respuestaBooleana = {
+            "1": "Si",
+            "2": "No",
+            "3": "No sabe/no responde",
+            "Null": "Null"
+        }
+
+    frecuencias = {
+        "1": "Varias veces a la semana",
+        "2". "Una vez a la semana",
+        "3": "Una vez al mes",
+        "4": "Una vez cada tres meses",
+        "5": "Por lo menos una vez al año",
+        "Null": "Null"
+    }
 
     def __init__(self):
-        self.sourceConnection = SourceConnection()
-        self.targetConnection = TargetConnection()
-        
-        self.imdbConnection = http.client.HTTPSConnection("imdb8.p.rapidapi.com")
-        self.imdbHeaders = {
-            'x-rapidapi-host': "imdb8.p.rapidapi.com",
-            'x-rapidapi-key': "fee7fa13a7mshd61881af4799557p172871jsndb85a36967f3"
-        }
-
-        self.categories = []
-
-        self.availableEndpoints = {
-            "Action": "%252Fchart%252Fpopular%252Fgenre%252Faction",
-            "Animation": "%252Fchart%252Fpopular%252Fgenre%252Fanimation",
-            "Comedy": "%252Fchart%252Fpopular%252Fgenre%252Fcomedy",
-            "Documentary": "%252Fchart%252Fpopular%252Fgenre%252Fdocumentary",
-            "Drama": "%252Fchart%252Fpopular%252Fgenre%252Fdrama",
-            "Family": "%252Fchart%252Fpopular%252Fgenre%252Ffamily",
-            "Horror": "%252Fchart%252Fpopular%252Fgenre%252Fhorror",
-            "Music": "%252Fchart%252Fpopular%252Fgenre%252Fmusic",
-            "Sci-Fi": "%252Fchart%252Fpopular%252Fgenre%252Fsci_fi",
-            "Sport": "%252Fchart%252Fpopular%252Fgenre%252Fsport",
-        }
+       self.targetConnection = TargetConnection()
     
     def startETL4(self):
-        rows_upload: []
-        self.loadCategories()
-
-        self.loadTemporaryTable()
-
-        for category in self.categories:
-            top5Sakila = self.getTop5PerCategorySakila(category)
-            top5IMDb = self.getTop5PerCategoryIMDb(category)
-
-            for i in range(len(top5Sakila)):
-                query_insert = ("INSERT INTO top_5_popularity_comparison " +
-                    "(sakila_film_title, sakila_film_popularity, sakila_category, imdb_film_title, imdb_film_popularity, imdb_film_category) VALUES (" +
-                    "'"+ top5Sakila[i][0] +"', "+
-                    ""+ str(top5Sakila[i][1]) +","+
-                    "'"+ (top5Sakila[i][2]) +"',"+
-                    "'"+ (top5IMDb[i][0]) +"',"+
-                    ""+ str(top5IMDb[i][1]) +","+
-                    "'"+ (top5IMDb[i][2]) +"'"+
-                    ");")
-
-                self.targetConnection.runQuery(query_insert)
-                self.targetConnection.commitChanges()
+        self.cargarAnio2012()
     
-    def getPopularMoviesByCategoryIMDb(self, category):
-        self.imdbConnection.request(
-            "GET", 
-            "/title/get-popular-movies-by-genre?genre=" + category, 
-            headers=self.imdbHeaders)
+    def cargarAnio2012(self):
+        filepath = "./Encuesta/2012/Asistencia_a_espacios_culturales/Asistencia a espacios culturales.sav"
 
-        res = self.imdbConnection.getresponse()
-        data = res.read()
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-        movies = json.loads(data.decode("utf-8"))
+                query_insert = ("INSERT INTO EspaciosCulturales " +
+                        " ( Directorio, P5436, P5436S1, " + 
+                        " P5438S1, P5438S2, P5438S3, P5438S4," + 
+                        " P1064S1, P1064S2, P1064S3, P1064S4, P1064S5," +
+                        " P223S1, P223S2, P223S3, P223S4, P223S5, P223S6, P223S7, P223S8, P223S9, "+
+                        " P5447, P5447S1," +
+                        " P273S1, P273S2, P273S3, P273S4, P273S5, P273S6, P273S7, P273S8, "+
+                        " P5451, P5451S1, P227S1, P227S2, P227S3, P227S4, P227S5, P227S6, P227S7, P227S8, "+
+                        " P5454, P5454S1, P228S1, P228S2, P228S3, P228S4, P228S5, P228S6, P228S7, P228S8, "+
+                        " P5458, P5458S1A1, P5458S1A2, P5458S1A3, P5458S1A4, P5458S1A5, P5458S1A6, P5458S1A7, P5458S1A8, P5458S1A9 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        
+                        (( "\"" + self.respuestaBooleana[line[4]] + "\", " ) if (self.respuestaBooleana[line[4]] != "Null") else ("Null, "))  + # P5436
+                        (( "\"" + self.frecuencias[line[5]] + "\", " ) if (self.frecuencias[line[5]] != "Null") else ("Null, "))  + # P5436S1
+                        (( "\"" + self.respuestaBooleana[line[14]] + "\", " ) if (self.respuestaBooleana[line[14]] != "Null") else ("Null, "))  + # P5438S1
+                        (( "\"" + self.respuestaBooleana[line[15]] + "\", " ) if (self.respuestaBooleana[line[15]] != "Null") else ("Null, "))  + # P5438S2
+                        (( "\"" + self.respuestaBooleana[line[16]] + "\", " ) if (self.respuestaBooleana[line[16]] != "Null") else ("Null, "))  + # P5438S3
+                        (( "\"" + self.respuestaBooleana[line[17]] + "\", " ) if (self.respuestaBooleana[line[17]] != "Null") else ("Null, "))  + # P5438S4
+                        
+                        "NULL, " + #P1064S1
+                        "NULL, " + #P1064S2
+                        "NULL, " + #P1064S3
+                        "NULL, " + #P1064S4
+                        "NULL, " + #P1064S5
 
-        return movies
+                        (( "\"" + self.respuestaBooleana[line[6]] + "\", " ) if (self.respuestaBooleana[line[6]] != "Null") else ("Null, "))  + # P223S1
+                        (( "\"" + self.respuestaBooleana[line[7]] + "\", " ) if (self.respuestaBooleana[line[7]] != "Null") else ("Null, "))  + # P223S2
+                        (( "\"" + self.respuestaBooleana[line[8]] + "\", " ) if (self.respuestaBooleana[line[8]] != "Null") else ("Null, "))  + # P223S3
+                        (( "\"" + self.respuestaBooleana[line[9]] + "\", " ) if (self.respuestaBooleana[line[9]] != "Null") else ("Null, "))  + # P223S4
+                        (( "\"" + self.respuestaBooleana[line[10]] + "\", " ) if (self.respuestaBooleana[line[10]] != "Null") else ("Null, "))  + # P223S5
+                        (( "\"" + self.respuestaBooleana[line[11]] + "\", " ) if (self.respuestaBooleana[line[11]] != "Null") else ("Null, "))  + # P223S6
+                        (( "\"" + self.respuestaBooleana[line[12]] + "\", " ) if (self.respuestaBooleana[line[12]] != "Null") else ("Null, "))  + # P223S7
+                        (( "\"" + self.respuestaBooleana[line[13]] + "\", " ) if (self.respuestaBooleana[line[13]] != "Null") else ("Null, "))  + # P223S8
+                        "NULL, " + #P223S9    
+                        (( "\"" + self.respuestaBooleana[line[31]] + "\", " ) if (self.respuestaBooleana[line[31]] != "Null") else ("Null, "))  + # P5447
+                        (( "\"" + self.frecuencias[line[32]] + "\", " ) if (self.frecuencias[line[32]] != "Null") else ("Null, "))  + # P5447S1
 
-    def getMovieDetailsIMDb(self, name):
-        self.imdbConnection.request(
-            "GET", 
-            "/title/get-details?tconst="+name, 
-            headers=self.imdbHeaders)
+                        (( "\"" + self.respuestaBooleana[line[33]] + "\", " ) if (self.respuestaBooleana[line[33]] != "Null") else ("Null, "))  + # P273S1
+                        (( "\"" + self.respuestaBooleana[line[34]] + "\", " ) if (self.respuestaBooleana[line[34]] != "Null") else ("Null, "))  + # P273S2
+                        (( "\"" + self.respuestaBooleana[line[35]] + "\", " ) if (self.respuestaBooleana[line[35]] != "Null") else ("Null, "))  + # P273S3
+                        (( "\"" + self.respuestaBooleana[line[36]] + "\", " ) if (self.respuestaBooleana[line[36]] != "Null") else ("Null, "))  + # P273S4
+                        (( "\"" + self.respuestaBooleana[line[37]] + "\", " ) if (self.respuestaBooleana[line[37]] != "Null") else ("Null, "))  + # P273S5
+                        (( "\"" + self.respuestaBooleana[line[38]] + "\", " ) if (self.respuestaBooleana[line[38]] != "Null") else ("Null, "))  + # P273S6
+                        (( "\"" + self.respuestaBooleana[line[39]] + "\", " ) if (self.respuestaBooleana[line[39]] != "Null") else ("Null, "))  + # P273S7
+                        (( "\"" + self.respuestaBooleana[line[40]] + "\", " ) if (self.respuestaBooleana[line[40]] != "Null") else ("Null, "))  + # P273S8
 
-        res = self.imdbConnection.getresponse()
-        data = res.read()
+                        (( "\"" + self.respuestaBooleana[line[41]] + "\", " ) if (self.respuestaBooleana[line[41]] != "Null") else ("Null, "))  + # P5451
+                        (( "\"" + self.frecuencias[line[42]] + "\", " ) if (self.frecuencias[line[42]] != "Null") else ("Null, "))  + # P5451S1
 
-        movie = json.loads(data.decode("utf-8"))
+                        (( "\"" + self.respuestaBooleana[line[43]] + "\", " ) if (self.respuestaBooleana[line[43]] != "Null") else ("Null, "))  + # P227S1
+                        (( "\"" + self.respuestaBooleana[line[44]] + "\", " ) if (self.respuestaBooleana[line[44]] != "Null") else ("Null, "))  + # P227S2
+                        (( "\"" + self.respuestaBooleana[line[45]] + "\", " ) if (self.respuestaBooleana[line[45]] != "Null") else ("Null, "))  + # P227S3
+                        (( "\"" + self.respuestaBooleana[line[46]] + "\", " ) if (self.respuestaBooleana[line[46]] != "Null") else ("Null, "))  + # P227S4
+                        (( "\"" + self.respuestaBooleana[line[47]] + "\", " ) if (self.respuestaBooleana[line[47]] != "Null") else ("Null, "))  + # P227S5
+                        (( "\"" + self.respuestaBooleana[line[48]] + "\", " ) if (self.respuestaBooleana[line[48]] != "Null") else ("Null, "))  + # P227S6
+                        (( "\"" + self.respuestaBooleana[line[49]] + "\", " ) if (self.respuestaBooleana[line[49]] != "Null") else ("Null, "))  + # P227S7
+                        (( "\"" + self.respuestaBooleana[line[50]] + "\", " ) if (self.respuestaBooleana[line[50]] != "Null") else ("Null, "))  + # P227S8
 
-        return movie
-    
-    def getRatingsPerMovieIMDb(self, name):
-        self.imdbConnection.request(
-            "GET", 
-            "/title/get-ratings?tconst="+name, 
-            headers=self.imdbHeaders)
+                        (( "\"" + self.respuestaBooleana[line[51]] + "\", " ) if (self.respuestaBooleana[line[51]] != "Null") else ("Null, "))  + # P5454
+                        (( "\"" + self.frecuencias[line[52]] + "\", " ) if (self.frecuencias[line[52]] != "Null") else ("Null, "))  + # P5454
 
-        res = self.imdbConnection.getresponse()
-        data = res.read()
+                        (( "\"" + self.respuestaBooleana[line[53]] + "\", " ) if (self.respuestaBooleana[line[53]] != "Null") else ("Null, "))  + # P228S1
+                        (( "\"" + self.respuestaBooleana[line[54]] + "\", " ) if (self.respuestaBooleana[line[54]] != "Null") else ("Null, "))  + # P228S2
+                        (( "\"" + self.respuestaBooleana[line[55]] + "\", " ) if (self.respuestaBooleana[line[55]] != "Null") else ("Null, "))  + # P228S3
+                        (( "\"" + self.respuestaBooleana[line[56]] + "\", " ) if (self.respuestaBooleana[line[56]] != "Null") else ("Null, "))  + # P228S4
+                        (( "\"" + self.respuestaBooleana[line[57]] + "\", " ) if (self.respuestaBooleana[line[57]] != "Null") else ("Null, "))  + # P228S5
+                        (( "\"" + self.respuestaBooleana[line[58]] + "\", " ) if (self.respuestaBooleana[line[58]] != "Null") else ("Null, "))  + # P228S6
+                        (( "\"" + self.respuestaBooleana[line[59]] + "\", " ) if (self.respuestaBooleana[line[59]] != "Null") else ("Null, "))  + # P228S7
+                        (( "\"" + self.respuestaBooleana[line[60]] + "\", " ) if (self.respuestaBooleana[line[60]] != "Null") else ("Null, "))  + # P228S8
 
-        movie = json.loads(data.decode("utf-8"))
+                        (( "\"" + self.respuestaBooleana[line[61]] + "\", " ) if (self.respuestaBooleana[line[61]] != "Null") else ("Null, "))  + # P5458
 
-        return movie
+                        (( "\"" + self.respuestaBooleana[line[62]] + "\", " ) if (self.respuestaBooleana[line[62]] != "Null") else ("Null, "))  + # P5458S1A1
+                        (( "\"" + self.respuestaBooleana[line[63]] + "\", " ) if (self.respuestaBooleana[line[63]] != "Null") else ("Null, "))  + # P5458S1A2
+                        (( "\"" + self.respuestaBooleana[line[64]] + "\", " ) if (self.respuestaBooleana[line[64]] != "Null") else ("Null, "))  + # P5458S1A3
+                        (( "\"" + self.respuestaBooleana[line[65]] + "\", " ) if (self.respuestaBooleana[line[65]] != "Null") else ("Null, "))  + # P5458S1A4
+                        (( "\"" + self.respuestaBooleana[line[66]] + "\", " ) if (self.respuestaBooleana[line[66]] != "Null") else ("Null, "))  + # P5458S1A5
+                        (( "\"" + self.respuestaBooleana[line[67]] + "\", " ) if (self.respuestaBooleana[line[67]] != "Null") else ("Null, "))  + # P5458S1A6
+                        (( "\"" + self.respuestaBooleana[line[68]] + "\", " ) if (self.respuestaBooleana[line[68]] != "Null") else ("Null, "))  + # P5458S1A7
+                        (( "\"" + self.respuestaBooleana[line[69]] + "\", " ) if (self.respuestaBooleana[line[69]] != "Null") else ("Null, "))  + # P5458S1A8
 
-    def loadCategories(self):
-        query_categories = "SELECT name FROM category"
 
-        categories = self.sourceConnection.runQuery(query_categories)
-        
-        for category in categories:
-            self.categories.append(category[0])
-    
-    def loadTemporaryTable(self):
-        query_temporary = """ 
-        CREATE TEMPORARY TABLE top_5_popularity_comparison
-            (SELECT film.title, film.rental_rate, category.name as category
-                FROM film 
-                LEFT JOIN film_category ON (film.film_id = film_category.film_id)
-                LEFT JOIN category ON (film_category.category_id = category.category_id)
-                
-                ORDER BY name ASC, rental_rate DESC);
-        """
 
-        self.sourceConnection.runQuery(query_temporary)
-    
-    def getTop5PerCategorySakila(self, category):
-        query_top = "SELECT * FROM top_5_popularity_comparison WHERE category = '"+category+"' LIMIT 0, 5;"
+                        ")")
 
-        top5 = self.sourceConnection.runQuery(query_top)
-        
-        return top5
-    
-    def getTop5PerCategorySakila(self, category):
-        query_top = "SELECT * FROM top_5_popularity_comparison WHERE category = '"+category+"' LIMIT 0, 5;"
+                print(line)
 
-        top5 = self.sourceConnection.runQuery(query_top)
-        
-        return top5
-    
-    def getTop5PerCategoryIMDb(self, category):
-        if category in self.availableEndpoints.keys():
-            top5IMDb = []
-            movies = self.getPopularMoviesByCategoryIMDb(self.availableEndpoints[category])
-            
-            for i in range(0,5):
-                movie_id = movies[i].split("/")
-
-                movie = self.getMovieDetailsIMDb(movie_id[2])
-                rating = self.getRatingsPerMovieIMDb(movie_id[2])
-
-                title = movie['title'] if 'title' in rating.keys() else 'NULL'
-                rate = (int(rating['rating'])/2) if 'rating' in rating.keys() else 'NULL'
-
-                movie_row = (title, rate, category)    
-                
-                top5IMDb.append(movie_row)
-            
-            return top5IMDb
-        return [
-            ('NULL', 'NULL', category),
-            ('NULL', 'NULL', category),
-            ('NULL', 'NULL', category),
-            ('NULL', 'NULL', category),
-            ('NULL', 'NULL', category)
-            ]
     
     
