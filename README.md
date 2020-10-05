@@ -351,6 +351,9 @@ Para el proceso de migración y llenado de datos se analiza el formato en el que
 
 Para el año 2017 se almacenó la información en un formato CSV, para los años anteriores se realiza la lectura a partir de archivos .txt
 
-**Vivienda**
-
-**2012**: Se seleccionan las variables disponibles y se limpian los datos, hay datos faltantes que se completan con "No sabe/no responde"
+|  	| **Fuentes de extracción** 	| **Transformaciones en los datos** 	|
+|-	|-	|-	|
+| ETL #1:<br>Vivienda 	| * Tabla de viviendas (2012)<br>* Viviendas (2014)<br>* Viviendas (2016)<br>* Viviendas (2017) 	| - Se pasaron los datos convirtiendo la representación numérica en una cadena que representa la respuesta del entrevistado 	|
+| ETL #2:<br>Hogares 	| * Tabla de hogares (2012)<br>* Caracteristicas generales (2012)<br>* Hogares (2014)<br>* Caracteristicas generales (2014)<br>* Hogares (2016)<br>* Hogares (2017) 	| - Se pasaron los datos convirtiendo la representación numérica en una cadena que representa la respuesta del entrevistado<br>- Se tuvo que añadir valores faltantes que podían calcular a partir de valores en otras fuentes 	|
+| ETL #3:<br>Caracteristicas Generales 	| * Características generales (2012)<br>* Características generales (2014)<br>* Características generales (2016)<br>* Características generales (2017) 	| - Se pasaron los datos convirtiendo la representación numérica en una cadena que representa la respuesta del entrevistado 	|
+| ETL #4:<br>Espacios culturales y formación práctica 	| * Asistencia a espacios culturales (2012)<br>* Asistencia a espacios culturales niños de 5 a 11 años (2012)<br>* Espacios culturales formacion y practica (2014)<br>* Espacios culturales (niños de 5 a 11) (2014)<br>* Espacios culturales y formacion practica (2016)<br>* Ninos de 5 a 11 espacios culturales y formacion practica (2016)<br>* Espacios culturales y formacion practica (2017)<br>* Ninos de 5 a 11 espacios culturales y formacion_practica (2017) 	| - Se pasaron los datos convirtiendo la representación numérica en una cadena que representa la respuesta del entrevistado<br>- Se tuvo que añadir valores faltantes que podían calcular a partir de valores en otras fuentes 	|
