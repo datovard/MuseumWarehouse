@@ -3,11 +3,9 @@ Este repositorio contiene los datos relacionados al proyecto #1 de la materia ba
 
 ## 1. Descripción del negocio a trabajar.
 
-El proyecto está enfocado en el análisis del consumo de contenido cultural en la ciudad de Bogotá realizando un data warehouse que reúna múltiples reportes, encuestas, CSV's y datos. Todas las fuentes de datos serán procesadas para ser analizadas con el propósito de obtener los gustos e intereses de las personas que visitan estos eventos.
+El proyecto está enfocado en el análisis del consumo de contenido cultural en el país, realizando un data warehouse que reúna múltiples reportes, encuestas, CSV's y datos. Todas las fuentes de datos serán procesadas para ser analizadas con el propósito de obtener los gustos e intereses de las personas que visitan estos eventos.
 
 ## 2. Descripción de las fuentes de datos
-
-Varias fuentes de datos que van a ser usadas en este ejercicio son recopiladas de fuentes de datos abiertas tales como la [página de datos abiertos del gobierno de Colombia](https://www.datos.gov.co/). Los que serán usados son lo siguientes:
 
 ### [Encuesta de Consumo Cultural - ECC](https://www.datos.gov.co/Cultura/Encuesta-de-Consumo-Cultural-ECC/c6xg-ctcv):
 

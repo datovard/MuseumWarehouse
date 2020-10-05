@@ -114,8 +114,9 @@ class ETL2:
                 temp_2 = temp_2[0][1] if (len(temp_2) != 0) else 0
 
                 query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, P6008, P5345, P258, P259) values (" + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
                     "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # 
                     str(temp_1[3]) + ", " + # P6008
                     str(temp_1[4]) + ", " + # P5345
                     str(temp_2) + ", " + # P258
@@ -148,12 +149,13 @@ class ETL2:
                 results_less_5 = results_less_5[0][1] if (len(results_less_5) != 0) else 0
             
                 query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, P6008, P5345, P258, P259) values (" + 
-                    "\"" + line[0] + "\"," + 
-                    line[3] + ", " + 
-                    str(results_less_5) + ", " + 
-                    str(results_5_to_11) + ", " + 
-                    str(results_plus_12) + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
+                    "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # HOGAR_NUMERO
+                    line[3] + ", " + # P6008
+                    str(results_less_5) + ", " + # P5345
+                    str(results_5_to_11) + ", " + # P258
+                    str(results_plus_12) + # P259
                     ");")
 
                 self.runQuery(query_insert)
@@ -167,8 +169,9 @@ class ETL2:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
                 query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
                     "\"" + line[0] + "\"," + 
+                    line[2] + ", " + 
                     line[3] + ", " + 
                     line[4] + ", " + 
                     line[5] + ", " + 
@@ -190,8 +193,9 @@ class ETL2:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
                 query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
                     "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # HOGAR_NUMERO
                     line[3] + ", " + # P6008
                     line[4] + ", " + # P5345
                     line[5] + ", " + # P258
