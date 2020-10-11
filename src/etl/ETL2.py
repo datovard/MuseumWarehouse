@@ -6,209 +6,246 @@ import numpy as np
 class ETL2:
     targetConnection: None
 
-    actividadFrecuecia = {
-        "1": "Todos los días",
-        "2": "Varias veces a la semana",
-        "3": "Una vez a la semana",
-        "4": "Una vez al mes",
-        "5": "Una vez cada tres meses",
-        "6": "Por lo menos una vez al año",
-        "7": "Nunca",
-        "Null": "Null"
-    }
-
     def __init__(self):
-        self.targetConnection = TargetConnection()
+       self.targetConnection = TargetConnection()
     
     def startETL2(self):
-        self.cargarAnio2012()
-        self.cargarAnio2014()
-        self.cargarAnio2016()
-        self.cargarAnio2017()
-    
-    def createTemporalTable1(self):
-        filepath_1 = "./Encuesta/2012/Caracteristicas_generales/Características generales.sav"
+        #self.cargarEncuestaEspaciosCulturales()
+        self.cargarEncuestaEspaciosCulturalesMenores12()
         
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte(ID_CARACTERISTICAS_GENERALES_CORTE INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, P6008 INT, P5345 INT);"
+    def cargarEncuestaEspaciosCulturales(self):
+        anio2012 = [ "./Encuesta/2012/Asistencia_a_espacios_culturales/Asistencia a espacios culturales.sav",
+                    [4, 5, 14, 15, 16,
+                    17, None, None, None, None,
+                    None, 6, 7, 8, 9, 
+                    10, 11, 12, 13, None, 
+                    28, 29, 30, 31, 32, 
+                    33, 34, 35, 36, 37,
+                    38, 39, 40, 41, 42,
+                    43, 44, 45, 46, 47,
+                    48, 49, 50, 51, 52,
+                    53, 54, 55, 56, 57,
+                    58, 59, 60, 61, 62,
+                    63, 64, 65, 66, 67 ]]
 
-        self.runQuery(query)
-
-        with savReaderWriter.SavReader(filepath_1) as reader_1:
-            header = reader_1.header
-            for line in reader_1:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query = ("INSERT INTO caracteristicas_generales_corte " +
-                        " ( DIRECTORIO, Hogarnmero, P6008, P5345 ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # Hogarnmero
-                        line[4] + ", " + # P6008
-                        line[5] + " " # P5345
-                        ");")
-                self.runQuery(query)
-    
-    def createTemporalTable2(self):
-        filepath_2 = "./Encuesta/2012/Caracteristicas_generales_personas_de_5_a_11_anos/Características generales personas de 5 a 11 años.sav"
-
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte_2(ID_CARACTERISTICAS_GENERALES_CORTE_2 INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, Personanmero INT);"
-
-        self.runQuery(query)
-
-        with savReaderWriter.SavReader(filepath_2) as reader_2:
-            header = reader_2.header
-            for line in reader_2:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query = ("INSERT INTO caracteristicas_generales_corte_2 " +
-                        " ( DIRECTORIO, Hogarnmero, Personanmero ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # Hogarnmero
-                        line[3] + "" + # Personanmero
-                        ");")
-                
-                self.runQuery(query)
-    
-    def createTemporalTable3(self):
-        filepath_1 = "./Encuesta/2014/Caracteristicas_Generales/CARACTERISTICAS GENERALES.sav"
+        anio2014 = [ "./Encuesta/2012/Asistencia_a_espacios_culturales/Asistencia a espacios culturales.sav",
+                    [4, 5, 15, 16, 17,
+                    18, 19, 20, 21, 22,
+                    23, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14,
+                    44, 45, 46, 47, 48,
+                    49, 50, 51, 52, 53,
+                    54, 55, 56, 57, 58,
+                    59, 60, 61, 62, 63,
+                    64, 65, 66, 67, 68,
+                    69, 70, 71, 72, 73,
+                    74, 75, 76, 77, 78,
+                    79, 80, 81, 82, 83]]
         
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_sub(ID_CARACTERISTICAS_GENERALES_SUB INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), HOGAR_NUMERO INT, P5785 INT);"
+        anio2016 = [ "./Encuesta/2016/Espacios_culturales_y_formacion_practica/Espacios culturales y formación práctica.sav",
+                    [4, 5, 6, 7, 8,
+                    9, 10, 11, 12, 13,
+                    14, 15, 16, 17, 18,
+                    19, 20, 21, 23, 22,
+                    44, 45, 46, 47, 48,
+                    49, 50, 51, 52, 53,
+                    54, 55, 56, 57, 58,
+                    59, 60, 61, 62, 63,
+                    64, 65, 66, 67, 68,
+                    69, 70, 71, 72, 73,
+                    74, 75, 76, 77, 78,
+                    79, 80, 81, 82, 83]
+                    ]
 
-        self.runQuery(query)
+        anio2017 = [ "./Encuesta/2017/Espacios_culturales_y_formacion_practica/Espacios culturales y formacion practica.sav",
+                    [4, 5, 6, 7, 8,
+                    9, 10, 11, 12, 13,
+                    14, 15, 16, 17, 18,
+                    19, 20, 21, 23, 22,
+                    44, 45, 46, 47, 48,
+                    49, 50, 51, 52, 53,
+                    54, 55, 56, 57, 58,
+                    59, 60, 61, 62, 63,
+                    64, 65, 66, 67, 68,
+                    69, 70, 71, 72, 73,
+                    74, 75, 76, 77, 78,
+                    79, 80, 81, 82, 83]
+                    ]
+        self.cargarEncuesta(anio2012)
+        self.cargarEncuesta(anio2014)
+        self.cargarEncuesta(anio2016)
+        self.cargarEncuesta(anio2017)
 
-        with savReaderWriter.SavReader(filepath_1) as reader_1:
-            header = reader_1.header
-            for line in reader_1:
+    def cargarEncuesta(self, params):
+        searchIndexes = params[1]
+        with savReaderWriter.SavReader(params[0]) as reader:
+            header = reader.header
+            for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query = ("INSERT INTO caracteristicas_generales_sub " +
-                        " ( DIRECTORIO, HOGAR_NUMERO, P5785 ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # HOGAR_NUMERO
-                        line[5] + # P6008
-                        ");")
+                query_insert = ("INSERT INTO DIM_Encuesta_Espacios_Culturales " +
+                    " ( DIRECTORIO, HOGAR_NUMERO, PERSONA_NUMERO, " + 
+                    " asistio_biblio, " + 
+                    " asistio_biblio_frecuencia, " + 
+                    " asistio_biblio_escolar, " + 
+                    " asistio_biblio_universitaria, " + 
+                    " asistio_biblio_especializada, " + 
+                    " asistio_biblio_publica, " + 
+                    " asistio_biblio_leer_libro, " + 
+                    " asistio_biblio_prestamo_libro, " + 
+                    " asistio_biblio_consultar_audiovisuales, " + 
+                    " asistio_biblio_acceder_internet, " + 
+                    " asistio_biblioteca_otro, " + 
+                    " no_asistio_biblio_falta_dinero, " + 
+                    " no_asistio_biblio_estan_lejos, " + 
+                    " no_asistio_biblio_desinteres, " + 
+                    " no_asistio_biblio_desconocimiento, " + 
+                    " no_asistio_biblio_falta_tiempo, " + 
+                    " no_asistio_biblio_problemas_salud, " + 
+                    " no_asistio_biblio_ausencia_espacios, " + 
+                    " no_asistio_biblio_otro, " + 
+                    " no_asistio_biblio_prefiere_internet, " + 
+                    " asistio_museos, " + 
+                    " asistio_museos_frecuencia, " + 
+                    " no_asistio_museos_estan_lejos, " + 
+                    " no_asistio_museos_problemas_salud, " + 
+                    " no_asistio_museos_falta_tiempo, " + 
+                    " no_asistio_museos_desinteres, " + 
+                    " no_asistio_museos_ausencia_espacios, " + 
+                    " no_asistio_museos_falta_dinero, " + 
+                    " no_asistio_museos_desconocimiento, " + 
+                    " no_asistio_museos_otro, " + 
+                    " asistio_galeria, " + 
+                    " asistio_galeria_frecuencia, " + 
+                    " no_asistio_galeria_falta_dinero, " + 
+                    " no_asistio_galeria_desinteres, " + 
+                    " no_asistio_galeria_desconocimiento, " + 
+                    " no_asistio_galeria_problemas_salud, " + 
+                    " no_asistio_galeria_estan_lejos, " + 
+                    " no_asistio_galeria_ausencia_espacios, " + 
+                    " no_asistio_galeria_falta_tiempo, " + 
+                    " no_asistio_galeria_otro, " + 
+                    " asistio_monumentos, " + 
+                    " asistio_monumentos_frecuencia, " + 
+                    " no_asistio_monumentos_problemas_salud, " + 
+                    " no_asistio_monumentos_estan_lejos, " + 
+                    " no_asistio_monumentos_falta_tiempo, " + 
+                    " no_asistio_monumentos_desinteres, " + 
+                    " no_asistio_monumentos_ausencia_espacios, " + 
+                    " no_asistio_monumentos_falta_dinero, " + 
+                    " no_asistio_monumentos_desconocimiento, " + 
+                    " no_asistio_monumentos_otro, " + 
+                    " tomo_talleres_artisticos, " + 
+                    " tomo_talleres_artisticos_cine_tv_radio, " + 
+                    " tomo_talleres_artisticos_musica, " + 
+                    " tomo_talleres_artisticos_teatro_danza, " + 
+                    " tomo_talleres_artisticos_cuenteria, " + 
+                    " tomo_talleres_artisticos_foto_pintura, " + 
+                    " tomo_talleres_artisticos_literatura, " + 
+                    " tomo_talleres_artisticos_artesanias, " + 
+                    " tomo_talleres_artisticos_manualidades, " + 
+                    " tomo_talleres_artisticos_otros " + 
+                    " ) " +
+                    "values (" +
+                    "\"" + line[0] + "\", " + # Directorio
+                    str(line[2]) + ", " + # HOGAR_NUMERO
+                    str(line[3]) + ", ") # PERSONA_NUMERO
+
+                for i in range(len(searchIndexes)):
+                    query_insert += (str(line[searchIndexes[i]]) if (searchIndexes[i] is not None and line[searchIndexes[i]] is not None) else "Null")
+                    if i < len(searchIndexes) -1 :
+                        query_insert += ", "
+                    
+                query_insert += ");"
                 
-                self.runQuery(query)
+                self.runQuery(query_insert)
     
-    def cargarAnio2012(self):
-        self.createTemporalTable1()
-        self.createTemporalTable2()
+    def cargarEncuestaEspaciosCulturalesMenores12(self):
+        anio2012 = [ "./Encuesta/2012/Asistencia_a_espacios_culturales_personas_de_5_a_11_anos/Asistencia a espacios culturales personas de 5 a 11 años.sav",
+                    [4, 5, 8, 9, 10,
+                    11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25,
+                    46, 47, 48, 49, 50]]
 
-        filepath = "./Encuesta/2012/Tabla_de_hogares/Tabla de hogares.sav"
-
-        with savReaderWriter.SavReader(filepath) as reader:
+        anio2014 = [ "./Encuesta/2014/Espacios_culturales_(ninos_de_5_a_11)/NIÑOS DE 5 A 11 ESPACIOS CULTURALES Y FORMACION Y PRACTICA.sav",
+                    [4, 5, 8, 9, 10,
+                    11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25,
+                    46, 47, 48, 49, 50]]
+        
+        anio2016 = [ "./Encuesta/2016/Ninos_de_5_a_11_espacios_culturales_y_formacion_practica/Niños de 5 a 11 espacios culturales y formación práctica..sav",
+                    [4, 5, 8, 9, 10,
+                    11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25,
+                    46, 47, 48, 49, 50]]
+        
+        anio2017 = [ "./Encuesta/2017/Ninos_de_5_a_11_espacios_culturales_y_formacion_practica/Niños de 5 a 11 espacios culturales y formacion practica..sav",
+                    [4, 5, 8, 9, 10,
+                    11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25,
+                    46, 47, 48, 49, 50]]
+        
+        self.cargarEncuestaMenores(anio2012)
+        self.cargarEncuestaMenores(anio2014)
+        self.cargarEncuestaMenores(anio2016)
+        self.cargarEncuestaMenores(anio2017)
+    
+    def cargarEncuestaMenores(self, params):
+        searchIndexes = params[1]
+        with savReaderWriter.SavReader(params[0]) as reader:
             header = reader.header
             for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query_temp_1 = "SELECT * FROM caracteristicas_generales_corte WHERE P6008 IS NOT NULL AND P5345 IS NOT NULL AND DIRECTORIO = \""+ line[0] +"\" AND Hogarnmero =  " + line[2]
+                query_insert = ("INSERT INTO DIM_Encuesta_Espacios_Culturales_Menores " +
+                    " ( DIRECTORIO, HOGAR_NUMERO, PERSONA_NUMERO, " + 
+                    "nino_asistio_biblio, " +
+                    "nino_asistio_biblio_frecuencia, " +
+                    "nino_asistio_centro_cultural, " +
+                    "nino_asistio_centro_cultural_frecuencia, " +
+                    "nino_asistio_museos, " +
+                    "nino_asistio_museos_frecuencia, " +
+                    "nino_asistio_galeria, " +
+                    "nino_asistio_galeria_frecuencia, " +
+                    "nino_asistio_monumentos, " +
+                    "nino_asistio_monumentos_frecuencia, " +
+                    "nino_tomo_talleres_artisticos, " +
+                    "nino_tomo_talleres_artisticos_cine_tv_radio, " +
+                    "nino_tomo_talleres_artisticos_musica, " +
+                    "nino_tomo_talleres_artisticos_teatro_danza, " +
+                    "nino_tomo_talleres_artisticos_cuenteria, " +
+                    "nino_tomo_talleres_artisticos_foto_pintura, " +
+                    "nino_tomo_talleres_artisticos_literatura, " +
+                    "nino_tomo_talleres_artisticos_artesanias, " +
+                    "nino_tomo_talleres_artisticos_manualidades, " +
+                    "nino_tomo_talleres_artisticos_otros, " +
+                    "nino_tomo_actividades_ludicas, " +
+                    "nino_tomo_actividades_ludicas_frecuencia, " +
+                    "nino_actividades_lud_con_familia, " +
+                    "nino_actividades_lud_con_companeros, " +
+                    "nino_actividades_lud_solo " +
+                    " ) " +
+                    "values (" +
+                    "\"" + line[0] + "\", " + # Directorio
+                    str(line[2]) + ", " + # HOGAR_NUMERO
+                    str(line[3]) + ", ") # PERSONA_NUMERO
 
-                temp_1 = self.targetConnection.runQueryWithReturn(query_temp_1)
-                temp_1 = temp_1[0] if len(temp_1) > 0 else (0, '', 0, 0, 0 )
-
-                query_temp_2 = "SELECT DIRECTORIO, COUNT(Personanmero) FROM caracteristicas_generales_corte_2 where DIRECTORIO = \"" + line[0] + "\" AND Hogarnmero = " + line[2] + " group by DIRECTORIO" ;
+                for i in range(len(searchIndexes)):
+                    query_insert += (str(line[searchIndexes[i]]) if (searchIndexes[i] is not None and line[searchIndexes[i]] is not None) else "Null")
+                    if i < len(searchIndexes) -1 :
+                        query_insert += ", "
+                    
+                query_insert += ");"
                 
-                temp_2 = self.targetConnection.runQueryWithReturn(query_temp_2)
-                temp_2 = temp_2[0][1] if (len(temp_2) != 0) else 0
-
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # 
-                    str(temp_1[3]) + ", " + # P6008
-                    str(temp_1[4]) + ", " + # P5345
-                    str(temp_2) + ", " + # P258
-                    str(temp_1[3] - temp_1[4] - temp_2 ) + # P259
-                    ");")
-
                 self.runQuery(query_insert)
 
-    
-    def cargarAnio2014(self):
-        self.createTemporalTable3()
-
-        filepath = "./Encuesta/2014/Hogares/HOGARES.sav"
-
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query_plus_12 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 12 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;"
-                query_5_to_10 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 5 AND P5785 <= 11 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;" 
-                query_less_5 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 < 5 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + "  GROUP BY DIRECTORIO;"
-
-                results_plus_12 = self.targetConnection.runQueryWithReturn(query_plus_12)
-                results_5_to_10 = self.targetConnection.runQueryWithReturn(query_5_to_10)
-                results_less_5 = self.targetConnection.runQueryWithReturn(query_less_5)
-                
-                results_plus_12 = results_plus_12[0][1] if (len(results_plus_12) != 0) else 0
-                results_5_to_11 = results_5_to_10[0][1] if (len(results_5_to_10) != 0) else 0
-                results_less_5 = results_less_5[0][1] if (len(results_less_5) != 0) else 0
-            
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # HOGAR_NUMERO
-                    line[3] + ", " + # P6008
-                    str(results_less_5) + ", " + # P5345
-                    str(results_5_to_11) + ", " + # P258
-                    str(results_plus_12) + # P259
-                    ");")
-
-                self.runQuery(query_insert)
-    
-    def cargarAnio2016(self):
-        filepath = "./Encuesta/2016/Hogares/Hogares.sav"
-
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
-                    "\"" + line[0] + "\"," + 
-                    line[2] + ", " + 
-                    line[3] + ", " + 
-                    line[4] + ", " + 
-                    line[5] + ", " + 
-                    line[6] + ", " +
-                    "\"" + self.actividadFrecuecia[line[8]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[9]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[10]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[11]] + "\"" +
-                    ");")
-
-                self.runQuery(query_insert)
-    
-    def cargarAnio2017(self):
-        filepath = "./Encuesta/2017/Hogares/Hogares.sav"
-
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # HOGAR_NUMERO
-                    line[3] + ", " + # P6008
-                    line[4] + ", " + # P5345
-                    line[5] + ", " + # P258
-                    line[6] + ", " + # P259
-                    "\"" + self.actividadFrecuecia[line[7]] + "\", " + # P1700S1
-                    "\"" + self.actividadFrecuecia[line[8]] + "\", " + # P1700S2
-                    "\"" + self.actividadFrecuecia[line[9]] + "\", " + # P1700S3
-                    "\"" + self.actividadFrecuecia[line[10]] + "\"" + # P1700S4
-                    ");")
-                self.runQuery(query_insert)
-    
     def runQuery(self, query):
         results = self.targetConnection.runQueryWithoutReturn(query)
         self.targetConnection.commitChanges()
+
     
     

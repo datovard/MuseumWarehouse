@@ -1,6 +1,5 @@
 from connections.TargetConnection import TargetConnection
 
-
 import savReaderWriter
 import numpy as np
 
@@ -31,6 +30,7 @@ class ETL1:
         self.cargarTemporales(anio2012)
         self.cargarTemporales(anio2014)
         self.cargarTemporales(anio2016)
+        self.cargarTemporales(anio2017)
         self.cargarHogares("./Encuesta/2012/Tabla_de_hogares/Tabla de hogares.sav")
         self.cargarHogares("./Encuesta/2014/Hogares/HOGARES.sav")
         self.cargarHogares("./Encuesta/2016/Hogares/Hogares.sav")

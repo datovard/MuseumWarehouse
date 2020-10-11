@@ -6,124 +6,198 @@ import numpy as np
 class ETL4:
     targetConnection: None
 
-    respuestaBooleana = {
-            "1": "Si",
-            "2": "No",
-            "3": "No sabe/no responde",
-            "Null": "Null"
-        }
-
-    frecuencias = {
-        "1": "Varias veces a la semana",
-        "2". "Una vez a la semana",
-        "3": "Una vez al mes",
-        "4": "Una vez cada tres meses",
-        "5": "Por lo menos una vez al año",
-        "Null": "Null"
-    }
-
     def __init__(self):
-       self.targetConnection = TargetConnection()
+        self.targetConnection = TargetConnection()
     
     def startETL4(self):
         self.cargarAnio2012()
+        self.cargarAnio2014()
+        self.cargarAnio2016()
+        self.cargarAnio2017()
+    
+    def createTemporalTable1(self):
+        filepath_1 = "./Encuesta/2012/Caracteristicas_generales/Características generales.sav"
+        
+        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte(ID_CARACTERISTICAS_GENERALES_CORTE INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, P6008 INT, P5345 INT);"
+
+        self.runQuery(query)
+
+        with savReaderWriter.SavReader(filepath_1) as reader_1:
+            header = reader_1.header
+            for line in reader_1:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+
+                query = ("INSERT INTO caracteristicas_generales_corte " +
+                        " ( DIRECTORIO, Hogarnmero, P6008, P5345 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        line[2] + ", " + # Hogarnmero
+                        line[4] + ", " + # P6008
+                        line[5] + " " # P5345
+                        ");")
+                self.runQuery(query)
+    
+    def createTemporalTable2(self):
+        filepath_2 = "./Encuesta/2012/Caracteristicas_generales_personas_de_5_a_11_anos/Características generales personas de 5 a 11 años.sav"
+
+        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte_2(ID_CARACTERISTICAS_GENERALES_CORTE_2 INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, Personanmero INT);"
+
+        self.runQuery(query)
+
+        with savReaderWriter.SavReader(filepath_2) as reader_2:
+            header = reader_2.header
+            for line in reader_2:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+
+                query = ("INSERT INTO caracteristicas_generales_corte_2 " +
+                        " ( DIRECTORIO, Hogarnmero, Personanmero ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        line[2] + ", " + # Hogarnmero
+                        line[3] + "" + # Personanmero
+                        ");")
+                
+                self.runQuery(query)
+    
+    def createTemporalTable3(self):
+        filepath_1 = "./Encuesta/2014/Caracteristicas_Generales/CARACTERISTICAS GENERALES.sav"
+        
+        query = "CREATE TEMPORARY TABLE caracteristicas_generales_sub(ID_CARACTERISTICAS_GENERALES_SUB INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), HOGAR_NUMERO INT, P5785 INT);"
+
+        self.runQuery(query)
+
+        with savReaderWriter.SavReader(filepath_1) as reader_1:
+            header = reader_1.header
+            for line in reader_1:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+
+                query = ("INSERT INTO caracteristicas_generales_sub " +
+                        " ( DIRECTORIO, HOGAR_NUMERO, P5785 ) " +
+                        "values (" +
+                        "\"" + line[0] + "\", " + # Directorio
+                        line[2] + ", " + # HOGAR_NUMERO
+                        line[5] + # P6008
+                        ");")
+                
+                self.runQuery(query)
     
     def cargarAnio2012(self):
-        filepath = "./Encuesta/2012/Asistencia_a_espacios_culturales/Asistencia a espacios culturales.sav"
+        self.createTemporalTable1()
+        self.createTemporalTable2()
+
+        filepath = "./Encuesta/2012/Tabla_de_hogares/Tabla de hogares.sav"
 
         with savReaderWriter.SavReader(filepath) as reader:
             header = reader.header
             for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query_insert = ("INSERT INTO EspaciosCulturales " +
-                        " ( Directorio, P5436, P5436S1, " + 
-                        " P5438S1, P5438S2, P5438S3, P5438S4," + 
-                        " P1064S1, P1064S2, P1064S3, P1064S4, P1064S5," +
-                        " P223S1, P223S2, P223S3, P223S4, P223S5, P223S6, P223S7, P223S8, P223S9, "+
-                        " P5447, P5447S1," +
-                        " P273S1, P273S2, P273S3, P273S4, P273S5, P273S6, P273S7, P273S8, "+
-                        " P5451, P5451S1, P227S1, P227S2, P227S3, P227S4, P227S5, P227S6, P227S7, P227S8, "+
-                        " P5454, P5454S1, P228S1, P228S2, P228S3, P228S4, P228S5, P228S6, P228S7, P228S8, "+
-                        " P5458, P5458S1A1, P5458S1A2, P5458S1A3, P5458S1A4, P5458S1A5, P5458S1A6, P5458S1A7, P5458S1A8, P5458S1A9 ) " +
-                        "values (" +
-                        
-                        "\"" + line[0] + "\", " + # Directorio
-                        
-                        (( "\"" + self.respuestaBooleana[line[4]] + "\", " ) if (self.respuestaBooleana[line[4]] != "Null") else ("Null, "))  + # P5436
-                        (( "\"" + self.frecuencias[line[5]] + "\", " ) if (self.frecuencias[line[5]] != "Null") else ("Null, "))  + # P5436S1
-                        (( "\"" + self.respuestaBooleana[line[14]] + "\", " ) if (self.respuestaBooleana[line[14]] != "Null") else ("Null, "))  + # P5438S1
-                        (( "\"" + self.respuestaBooleana[line[15]] + "\", " ) if (self.respuestaBooleana[line[15]] != "Null") else ("Null, "))  + # P5438S2
-                        (( "\"" + self.respuestaBooleana[line[16]] + "\", " ) if (self.respuestaBooleana[line[16]] != "Null") else ("Null, "))  + # P5438S3
-                        (( "\"" + self.respuestaBooleana[line[17]] + "\", " ) if (self.respuestaBooleana[line[17]] != "Null") else ("Null, "))  + # P5438S4
-                        
-                        "NULL, " + #P1064S1
-                        "NULL, " + #P1064S2
-                        "NULL, " + #P1064S3
-                        "NULL, " + #P1064S4
-                        "NULL, " + #P1064S5
+                query_temp_1 = "SELECT * FROM caracteristicas_generales_corte WHERE P6008 IS NOT NULL AND P5345 IS NOT NULL AND DIRECTORIO = \""+ line[0] +"\" AND Hogarnmero =  " + line[2]
 
-                        (( "\"" + self.respuestaBooleana[line[6]] + "\", " ) if (self.respuestaBooleana[line[6]] != "Null") else ("Null, "))  + # P223S1
-                        (( "\"" + self.respuestaBooleana[line[7]] + "\", " ) if (self.respuestaBooleana[line[7]] != "Null") else ("Null, "))  + # P223S2
-                        (( "\"" + self.respuestaBooleana[line[8]] + "\", " ) if (self.respuestaBooleana[line[8]] != "Null") else ("Null, "))  + # P223S3
-                        (( "\"" + self.respuestaBooleana[line[9]] + "\", " ) if (self.respuestaBooleana[line[9]] != "Null") else ("Null, "))  + # P223S4
-                        (( "\"" + self.respuestaBooleana[line[10]] + "\", " ) if (self.respuestaBooleana[line[10]] != "Null") else ("Null, "))  + # P223S5
-                        (( "\"" + self.respuestaBooleana[line[11]] + "\", " ) if (self.respuestaBooleana[line[11]] != "Null") else ("Null, "))  + # P223S6
-                        (( "\"" + self.respuestaBooleana[line[12]] + "\", " ) if (self.respuestaBooleana[line[12]] != "Null") else ("Null, "))  + # P223S7
-                        (( "\"" + self.respuestaBooleana[line[13]] + "\", " ) if (self.respuestaBooleana[line[13]] != "Null") else ("Null, "))  + # P223S8
-                        "NULL, " + #P223S9    
-                        (( "\"" + self.respuestaBooleana[line[31]] + "\", " ) if (self.respuestaBooleana[line[31]] != "Null") else ("Null, "))  + # P5447
-                        (( "\"" + self.frecuencias[line[32]] + "\", " ) if (self.frecuencias[line[32]] != "Null") else ("Null, "))  + # P5447S1
+                temp_1 = self.targetConnection.runQueryWithReturn(query_temp_1)
+                temp_1 = temp_1[0] if len(temp_1) > 0 else (0, '', 0, 0, 0 )
 
-                        (( "\"" + self.respuestaBooleana[line[33]] + "\", " ) if (self.respuestaBooleana[line[33]] != "Null") else ("Null, "))  + # P273S1
-                        (( "\"" + self.respuestaBooleana[line[34]] + "\", " ) if (self.respuestaBooleana[line[34]] != "Null") else ("Null, "))  + # P273S2
-                        (( "\"" + self.respuestaBooleana[line[35]] + "\", " ) if (self.respuestaBooleana[line[35]] != "Null") else ("Null, "))  + # P273S3
-                        (( "\"" + self.respuestaBooleana[line[36]] + "\", " ) if (self.respuestaBooleana[line[36]] != "Null") else ("Null, "))  + # P273S4
-                        (( "\"" + self.respuestaBooleana[line[37]] + "\", " ) if (self.respuestaBooleana[line[37]] != "Null") else ("Null, "))  + # P273S5
-                        (( "\"" + self.respuestaBooleana[line[38]] + "\", " ) if (self.respuestaBooleana[line[38]] != "Null") else ("Null, "))  + # P273S6
-                        (( "\"" + self.respuestaBooleana[line[39]] + "\", " ) if (self.respuestaBooleana[line[39]] != "Null") else ("Null, "))  + # P273S7
-                        (( "\"" + self.respuestaBooleana[line[40]] + "\", " ) if (self.respuestaBooleana[line[40]] != "Null") else ("Null, "))  + # P273S8
+                query_temp_2 = "SELECT DIRECTORIO, COUNT(Personanmero) FROM caracteristicas_generales_corte_2 where DIRECTORIO = \"" + line[0] + "\" AND Hogarnmero = " + line[2] + " group by DIRECTORIO" ;
+                
+                temp_2 = self.targetConnection.runQueryWithReturn(query_temp_2)
+                temp_2 = temp_2[0][1] if (len(temp_2) != 0) else 0
 
-                        (( "\"" + self.respuestaBooleana[line[41]] + "\", " ) if (self.respuestaBooleana[line[41]] != "Null") else ("Null, "))  + # P5451
-                        (( "\"" + self.frecuencias[line[42]] + "\", " ) if (self.frecuencias[line[42]] != "Null") else ("Null, "))  + # P5451S1
+                query_insert = ("INSERT INTO Hogares " + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
+                    "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # 
+                    str(temp_1[3]) + ", " + # P6008
+                    str(temp_1[4]) + ", " + # P5345
+                    str(temp_2) + ", " + # P258
+                    str(temp_1[3] - temp_1[4] - temp_2 ) + # P259
+                    ");")
 
-                        (( "\"" + self.respuestaBooleana[line[43]] + "\", " ) if (self.respuestaBooleana[line[43]] != "Null") else ("Null, "))  + # P227S1
-                        (( "\"" + self.respuestaBooleana[line[44]] + "\", " ) if (self.respuestaBooleana[line[44]] != "Null") else ("Null, "))  + # P227S2
-                        (( "\"" + self.respuestaBooleana[line[45]] + "\", " ) if (self.respuestaBooleana[line[45]] != "Null") else ("Null, "))  + # P227S3
-                        (( "\"" + self.respuestaBooleana[line[46]] + "\", " ) if (self.respuestaBooleana[line[46]] != "Null") else ("Null, "))  + # P227S4
-                        (( "\"" + self.respuestaBooleana[line[47]] + "\", " ) if (self.respuestaBooleana[line[47]] != "Null") else ("Null, "))  + # P227S5
-                        (( "\"" + self.respuestaBooleana[line[48]] + "\", " ) if (self.respuestaBooleana[line[48]] != "Null") else ("Null, "))  + # P227S6
-                        (( "\"" + self.respuestaBooleana[line[49]] + "\", " ) if (self.respuestaBooleana[line[49]] != "Null") else ("Null, "))  + # P227S7
-                        (( "\"" + self.respuestaBooleana[line[50]] + "\", " ) if (self.respuestaBooleana[line[50]] != "Null") else ("Null, "))  + # P227S8
+                self.runQuery(query_insert)
 
-                        (( "\"" + self.respuestaBooleana[line[51]] + "\", " ) if (self.respuestaBooleana[line[51]] != "Null") else ("Null, "))  + # P5454
-                        (( "\"" + self.frecuencias[line[52]] + "\", " ) if (self.frecuencias[line[52]] != "Null") else ("Null, "))  + # P5454
+    
+    def cargarAnio2014(self):
+        self.createTemporalTable3()
 
-                        (( "\"" + self.respuestaBooleana[line[53]] + "\", " ) if (self.respuestaBooleana[line[53]] != "Null") else ("Null, "))  + # P228S1
-                        (( "\"" + self.respuestaBooleana[line[54]] + "\", " ) if (self.respuestaBooleana[line[54]] != "Null") else ("Null, "))  + # P228S2
-                        (( "\"" + self.respuestaBooleana[line[55]] + "\", " ) if (self.respuestaBooleana[line[55]] != "Null") else ("Null, "))  + # P228S3
-                        (( "\"" + self.respuestaBooleana[line[56]] + "\", " ) if (self.respuestaBooleana[line[56]] != "Null") else ("Null, "))  + # P228S4
-                        (( "\"" + self.respuestaBooleana[line[57]] + "\", " ) if (self.respuestaBooleana[line[57]] != "Null") else ("Null, "))  + # P228S5
-                        (( "\"" + self.respuestaBooleana[line[58]] + "\", " ) if (self.respuestaBooleana[line[58]] != "Null") else ("Null, "))  + # P228S6
-                        (( "\"" + self.respuestaBooleana[line[59]] + "\", " ) if (self.respuestaBooleana[line[59]] != "Null") else ("Null, "))  + # P228S7
-                        (( "\"" + self.respuestaBooleana[line[60]] + "\", " ) if (self.respuestaBooleana[line[60]] != "Null") else ("Null, "))  + # P228S8
+        filepath = "./Encuesta/2014/Hogares/HOGARES.sav"
 
-                        (( "\"" + self.respuestaBooleana[line[61]] + "\", " ) if (self.respuestaBooleana[line[61]] != "Null") else ("Null, "))  + # P5458
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                        (( "\"" + self.respuestaBooleana[line[62]] + "\", " ) if (self.respuestaBooleana[line[62]] != "Null") else ("Null, "))  + # P5458S1A1
-                        (( "\"" + self.respuestaBooleana[line[63]] + "\", " ) if (self.respuestaBooleana[line[63]] != "Null") else ("Null, "))  + # P5458S1A2
-                        (( "\"" + self.respuestaBooleana[line[64]] + "\", " ) if (self.respuestaBooleana[line[64]] != "Null") else ("Null, "))  + # P5458S1A3
-                        (( "\"" + self.respuestaBooleana[line[65]] + "\", " ) if (self.respuestaBooleana[line[65]] != "Null") else ("Null, "))  + # P5458S1A4
-                        (( "\"" + self.respuestaBooleana[line[66]] + "\", " ) if (self.respuestaBooleana[line[66]] != "Null") else ("Null, "))  + # P5458S1A5
-                        (( "\"" + self.respuestaBooleana[line[67]] + "\", " ) if (self.respuestaBooleana[line[67]] != "Null") else ("Null, "))  + # P5458S1A6
-                        (( "\"" + self.respuestaBooleana[line[68]] + "\", " ) if (self.respuestaBooleana[line[68]] != "Null") else ("Null, "))  + # P5458S1A7
-                        (( "\"" + self.respuestaBooleana[line[69]] + "\", " ) if (self.respuestaBooleana[line[69]] != "Null") else ("Null, "))  + # P5458S1A8
+                query_plus_12 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 12 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;"
+                query_5_to_10 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 5 AND P5785 <= 11 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;" 
+                query_less_5 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 < 5 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + "  GROUP BY DIRECTORIO;"
 
+                results_plus_12 = self.targetConnection.runQueryWithReturn(query_plus_12)
+                results_5_to_10 = self.targetConnection.runQueryWithReturn(query_5_to_10)
+                results_less_5 = self.targetConnection.runQueryWithReturn(query_less_5)
+                
+                results_plus_12 = results_plus_12[0][1] if (len(results_plus_12) != 0) else 0
+                results_5_to_11 = results_5_to_10[0][1] if (len(results_5_to_10) != 0) else 0
+                results_less_5 = results_less_5[0][1] if (len(results_less_5) != 0) else 0
+            
+                query_insert = ("INSERT INTO Hogares " + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
+                    "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # HOGAR_NUMERO
+                    line[3] + ", " + # P6008
+                    str(results_less_5) + ", " + # P5345
+                    str(results_5_to_11) + ", " + # P258
+                    str(results_plus_12) + # P259
+                    ");")
 
+                self.runQuery(query_insert)
+    
+    def cargarAnio2016(self):
+        filepath = "./Encuesta/2016/Hogares/Hogares.sav"
 
-                        ")")
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                print(line)
+                query_insert = ("INSERT INTO Hogares " + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
+                    "\"" + line[0] + "\"," + 
+                    line[2] + ", " + 
+                    line[3] + ", " + 
+                    line[4] + ", " + 
+                    line[5] + ", " + 
+                    line[6] + ", " +
+                    "\"" + self.actividadFrecuecia[line[8]] + "\", " +
+                    "\"" + self.actividadFrecuecia[line[9]] + "\", " +
+                    "\"" + self.actividadFrecuecia[line[10]] + "\", " +
+                    "\"" + self.actividadFrecuecia[line[11]] + "\"" +
+                    ");")
 
+                self.runQuery(query_insert)
+    
+    def cargarAnio2017(self):
+        filepath = "./Encuesta/2017/Hogares/Hogares.sav"
+
+        with savReaderWriter.SavReader(filepath) as reader:
+            header = reader.header
+            for line in reader:
+                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+
+                query_insert = ("INSERT INTO Hogares " + 
+                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
+                    "\"" + line[0] + "\"," + # DIRECTORIO
+                    line[2] + ", " + # HOGAR_NUMERO
+                    line[3] + ", " + # P6008
+                    line[4] + ", " + # P5345
+                    line[5] + ", " + # P258
+                    line[6] + ", " + # P259
+                    "\"" + self.actividadFrecuecia[line[7]] + "\", " + # P1700S1
+                    "\"" + self.actividadFrecuecia[line[8]] + "\", " + # P1700S2
+                    "\"" + self.actividadFrecuecia[line[9]] + "\", " + # P1700S3
+                    "\"" + self.actividadFrecuecia[line[10]] + "\"" + # P1700S4
+                    ");")
+                self.runQuery(query_insert)
+    
+    def runQuery(self, query):
+        results = self.targetConnection.runQueryWithoutReturn(query)
+        self.targetConnection.commitChanges()
     
     
