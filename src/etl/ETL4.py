@@ -47,6 +47,7 @@ class ETL4:
                         " P5454, P5454S1, P228S1, P228S2, P228S3, P228S4, P228S5, P228S6, P228S7, P228S8, "+
                         " P5458, P5458S1A1, P5458S1A2, P5458S1A3, P5458S1A4, P5458S1A5, P5458S1A6, P5458S1A7, P5458S1A8, P5458S1A9 ) " +
                         "values (" +
+                        
                         "\"" + line[0] + "\", " + # Directorio
                         
                         (( "\"" + self.respuestaBooleana[line[4]] + "\", " ) if (self.respuestaBooleana[line[4]] != "Null") else ("Null, "))  + # P5436
