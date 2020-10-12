@@ -10,7 +10,7 @@ class ETL2:
        self.targetConnection = TargetConnection()
     
     def startETL2(self):
-        #self.cargarEncuestaEspaciosCulturales()
+        self.cargarEncuestaEspaciosCulturales()
         self.cargarEncuestaEspaciosCulturalesMenores12()
         
     def cargarEncuestaEspaciosCulturales(self):
