@@ -5,199 +5,136 @@ import numpy as np
 
 class ETL4:
     targetConnection: None
+    insertionCounter = 0
+    batchSize = 1000
 
     def __init__(self):
         self.targetConnection = TargetConnection()
     
     def startETL4(self):
-        self.cargarAnio2012()
-        self.cargarAnio2014()
-        self.cargarAnio2016()
-        self.cargarAnio2017()
-    
-    def createTemporalTable1(self):
-        filepath_1 = "./Encuesta/2012/Caracteristicas_generales/Características generales.sav"
+        self.cargarEncuestaPresentacionesEspectaculos()
+
+    def cargarEncuestaPresentacionesEspectaculos(self):
+        anio2012 = [ "./Encuesta/2012/Caracteristicas_generales/Características generales.sav",
+                    [6, 9, 10, 11, 12, 13, 14, 15, 16],
+                    "./Encuesta/2012/Tiempo_libre/Tiempo libre.sav",
+                    [4, 5, 6],
+                    2012]
         
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte(ID_CARACTERISTICAS_GENERALES_CORTE INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, P6008 INT, P5345 INT);"
-
-        self.runQuery(query)
-
-        with savReaderWriter.SavReader(filepath_1) as reader_1:
-            header = reader_1.header
-            for line in reader_1:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query = ("INSERT INTO caracteristicas_generales_corte " +
-                        " ( DIRECTORIO, Hogarnmero, P6008, P5345 ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # Hogarnmero
-                        line[4] + ", " + # P6008
-                        line[5] + " " # P5345
-                        ");")
-                self.runQuery(query)
-    
-    def createTemporalTable2(self):
-        filepath_2 = "./Encuesta/2012/Caracteristicas_generales_personas_de_5_a_11_anos/Características generales personas de 5 a 11 años.sav"
-
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_corte_2(ID_CARACTERISTICAS_GENERALES_CORTE_2 INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), Hogarnmero INT, Personanmero INT);"
-
-        self.runQuery(query)
-
-        with savReaderWriter.SavReader(filepath_2) as reader_2:
-            header = reader_2.header
-            for line in reader_2:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query = ("INSERT INTO caracteristicas_generales_corte_2 " +
-                        " ( DIRECTORIO, Hogarnmero, Personanmero ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # Hogarnmero
-                        line[3] + "" + # Personanmero
-                        ");")
-                
-                self.runQuery(query)
-    
-    def createTemporalTable3(self):
-        filepath_1 = "./Encuesta/2014/Caracteristicas_Generales/CARACTERISTICAS GENERALES.sav"
+        anio2014 = ["./Encuesta/2014/Caracteristicas_Generales/CARACTERISTICAS GENERALES.sav",
+                    [4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    "./Encuesta/2014/Presentaciones_y_espectaculos/PRESENTACIONES Y ESPECTACULOS.sav",
+                    [4, 5, 6],
+                    2014]
         
-        query = "CREATE TEMPORARY TABLE caracteristicas_generales_sub(ID_CARACTERISTICAS_GENERALES_SUB INT NOT NULL PRIMARY KEY AUTO_INCREMENT, DIRECTORIO VARCHAR(100), HOGAR_NUMERO INT, P5785 INT);"
+        anio2016 = ["./Encuesta/2016/Caracteristicas_generales/Características generales.sav",
+                    [4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    "./Encuesta/2016/Presentaciones_y_espectaculos/Presentaciones y espectaculos.sav",
+                    [4, 5, 6],
+                    2016]
+        
+        anio2017 = ["./Encuesta/2017/Caracteristicas_generales/Caracteristicas generales.sav",
+                    [4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    "./Encuesta/2017/Presentaciones_y_espectaculos/Presentaciones y espectaculos.sav",
+                    [3, 4, 5],
+                    2017]
+        
+        self.cargarEncuesta(anio2012)
+        self.cargarEncuesta(anio2014)
+        self.cargarEncuesta(anio2016)
+        self.cargarEncuesta(anio2017)
 
-        self.runQuery(query)
-
-        with savReaderWriter.SavReader(filepath_1) as reader_1:
-            header = reader_1.header
-            for line in reader_1:
+    def cargarEncuesta(self, params):
+        counter = 0
+        searchIndexes = params[1]
+        with savReaderWriter.SavReader(params[0]) as reader:
+            header = reader.header
+            for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query = ("INSERT INTO caracteristicas_generales_sub " +
-                        " ( DIRECTORIO, HOGAR_NUMERO, P5785 ) " +
-                        "values (" +
-                        "\"" + line[0] + "\", " + # Directorio
-                        line[2] + ", " + # HOGAR_NUMERO
-                        line[5] + # P6008
-                        ");")
+                query_hogar = "SELECT ID_HOGAR FROM DIM_Hogar WHERE DIRECTORIO = \""+ line[0] +"\" AND HOGAR_NUMERO = " + str(line[2])
+                hogar_id = self.targetConnection.runQueryWithReturn(query_hogar)
+                hogar_id = str(hogar_id[0][0]) if( hogar_id ) else "Null"
                 
-                self.runQuery(query)
-    
-    def cargarAnio2012(self):
-        self.createTemporalTable1()
-        self.createTemporalTable2()
+                query_encuesta_cultural = "SELECT ID_ENCUESTA_ESPACIOS_CULTURALES FROM DIM_Encuesta_Espacios_Culturales WHERE DIRECTORIO = \""+ line[0] +"\" AND HOGAR_NUMERO = " + str(line[2]) + " AND PERSONA_NUMERO = " + str(line[3])
+                encuesta_cultural_id = self.targetConnection.runQueryWithReturn(query_encuesta_cultural)
+                encuesta_cultural_id = str(encuesta_cultural_id[0][0]) if( encuesta_cultural_id ) else "Null"
 
-        filepath = "./Encuesta/2012/Tabla_de_hogares/Tabla de hogares.sav"
+                query_encuesta_cultural_menores = "SELECT ID_ENCUESTA_ESPACIOS_CULTURALES_MENORES FROM DIM_Encuesta_Espacios_Culturales_Menores WHERE DIRECTORIO = \""+ line[0] +"\" AND HOGAR_NUMERO = " + str(line[2]) + " AND PERSONA_NUMERO = " + str(line[3])
+                encuesta_cultural_menores_id = self.targetConnection.runQueryWithReturn(query_encuesta_cultural_menores)
+                encuesta_cultural_menores_id = str(encuesta_cultural_menores_id[0][0]) if( encuesta_cultural_menores_id ) else "Null"
 
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+                query_encuesta_eventos = "SELECT ID_ENCUESTA_PRESENTACIONES_ESPECTACULOS FROM DIM_Encuesta_Presentaciones_Espectaculos WHERE DIRECTORIO = \""+ line[0] +"\" AND HOGAR_NUMERO = " + str(line[2]) + " AND PERSONA_NUMERO = " + str(line[3])
+                encuesta_eventos_id = self.targetConnection.runQueryWithReturn(query_encuesta_eventos)
+                encuesta_eventos_id = str(encuesta_eventos_id[0][0]) if( encuesta_eventos_id ) else "Null"
 
-                query_temp_1 = "SELECT * FROM caracteristicas_generales_corte WHERE P6008 IS NOT NULL AND P5345 IS NOT NULL AND DIRECTORIO = \""+ line[0] +"\" AND Hogarnmero =  " + line[2]
+                query_insert = ("INSERT INTO FACT_Persona " +
+                    " (  " + 
+                    " DIRECTORIO, " + 
+                    " HOGAR_NUMERO, " + 
+                    " PERSONA_NUMERO, " + 
+                    " ID_HOGAR, " + 
+                    " ID_ENCUESTA_ESPACIOS_CULTURALES, " + 
+                    " ID_ENCUESTA_ESPACIOS_CULTURALES_MENORES, " + 
+                    " ID_ENCUESTA_PRESENTACIONES_ESPECTACULOS, " + 
+                    " genero, " + 
+                    " edad, " + 
+                    " cultura, " + 
+                    " parentesco_al_jefe, " + 
+                    " estado_civil, " + 
+                    " lee_escribe, " + 
+                    " estudia_actual, " + 
+                    " nivel_educativo, " + 
+                    " ultimo_grado, " + 
+                    " anio " + 
+                    " ) " +
+                    "values (" +
+                    "\"" + line[0] + "\", " +
+                    str(line[2]) + ", " +
+                    str(line[3]) + ", " +
+                    (hogar_id) + ", " +
+                    (encuesta_cultural_id) + ", " + 
+                    (encuesta_cultural_menores_id) + ", " +
+                    (encuesta_eventos_id) + ", "
+                    )
 
-                temp_1 = self.targetConnection.runQueryWithReturn(query_temp_1)
-                temp_1 = temp_1[0] if len(temp_1) > 0 else (0, '', 0, 0, 0 )
-
-                query_temp_2 = "SELECT DIRECTORIO, COUNT(Personanmero) FROM caracteristicas_generales_corte_2 where DIRECTORIO = \"" + line[0] + "\" AND Hogarnmero = " + line[2] + " group by DIRECTORIO" ;
+                for i in range(len(searchIndexes)):
+                    query_insert += (str(line[searchIndexes[i]]) if (searchIndexes[i] is not None and line[searchIndexes[i]] is not None) else "Null") + ", "
                 
-                temp_2 = self.targetConnection.runQueryWithReturn(query_temp_2)
-                temp_2 = temp_2[0][1] if (len(temp_2) != 0) else 0
-
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # 
-                    str(temp_1[3]) + ", " + # P6008
-                    str(temp_1[4]) + ", " + # P5345
-                    str(temp_2) + ", " + # P258
-                    str(temp_1[3] - temp_1[4] - temp_2 ) + # P259
-                    ");")
-
-                self.runQuery(query_insert)
-
-    
-    def cargarAnio2014(self):
-        self.createTemporalTable3()
-
-        filepath = "./Encuesta/2014/Hogares/HOGARES.sav"
-
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
-
-                query_plus_12 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 12 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;"
-                query_5_to_10 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 >= 5 AND P5785 <= 11 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + " GROUP BY DIRECTORIO;" 
-                query_less_5 = "SELECT DIRECTORIO, COUNT(P5785) FROM caracteristicas_generales_sub WHERE P5785 < 5 AND DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + line[2] + "  GROUP BY DIRECTORIO;"
-
-                results_plus_12 = self.targetConnection.runQueryWithReturn(query_plus_12)
-                results_5_to_10 = self.targetConnection.runQueryWithReturn(query_5_to_10)
-                results_less_5 = self.targetConnection.runQueryWithReturn(query_less_5)
+                query_insert += str(params[4]) + ");"
                 
-                results_plus_12 = results_plus_12[0][1] if (len(results_plus_12) != 0) else 0
-                results_5_to_11 = results_5_to_10[0][1] if (len(results_5_to_10) != 0) else 0
-                results_less_5 = results_less_5[0][1] if (len(results_less_5) != 0) else 0
-            
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # HOGAR_NUMERO
-                    line[3] + ", " + # P6008
-                    str(results_less_5) + ", " + # P5345
-                    str(results_5_to_11) + ", " + # P258
-                    str(results_plus_12) + # P259
-                    ");")
-
                 self.runQuery(query_insert)
-    
-    def cargarAnio2016(self):
-        filepath = "./Encuesta/2016/Hogares/Hogares.sav"
 
-        with savReaderWriter.SavReader(filepath) as reader:
+                '''counter += 1
+
+                if(counter == 100):
+                    break'''
+        
+        counter = 0
+        searchIndexes = params[3]
+        with savReaderWriter.SavReader(params[2]) as reader:
             header = reader.header
             for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
-                    "\"" + line[0] + "\"," + 
-                    line[2] + ", " + 
-                    line[3] + ", " + 
-                    line[4] + ", " + 
-                    line[5] + ", " + 
-                    line[6] + ", " +
-                    "\"" + self.actividadFrecuecia[line[8]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[9]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[10]] + "\", " +
-                    "\"" + self.actividadFrecuecia[line[11]] + "\"" +
-                    ");")
-
+                query_insert = ("UPDATE FACT_Persona SET " +
+                    "actividad_semana_pasada = " + str(line[searchIndexes[0]]) + ", " +
+                    "recibe_ingreso_mensual = " + str(line[searchIndexes[1]]) + ", " +
+                    "ingreso_total = " + str(line[searchIndexes[2]]) +
+                    " WHERE DIRECTORIO = \"" + line[0] + "\" AND HOGAR_NUMERO = " + str(line[2]) + " AND PERSONA_NUMERO = " + str(line[3]) +
+                    ";")
+                
                 self.runQuery(query_insert)
-    
-    def cargarAnio2017(self):
-        filepath = "./Encuesta/2017/Hogares/Hogares.sav"
+                
+                '''counter += 1
 
-        with savReaderWriter.SavReader(filepath) as reader:
-            header = reader.header
-            for line in reader:
-                line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
+                if(counter == 100):
+                    break'''
 
-                query_insert = ("INSERT INTO Hogares " + 
-                    " (DIRECTORIO, HOGAR_NUMERO, P6008, P5345, P258, P259, P1700S1, P1700S2, P1700S3, P1700S4) values (" + 
-                    "\"" + line[0] + "\"," + # DIRECTORIO
-                    line[2] + ", " + # HOGAR_NUMERO
-                    line[3] + ", " + # P6008
-                    line[4] + ", " + # P5345
-                    line[5] + ", " + # P258
-                    line[6] + ", " + # P259
-                    "\"" + self.actividadFrecuecia[line[7]] + "\", " + # P1700S1
-                    "\"" + self.actividadFrecuecia[line[8]] + "\", " + # P1700S2
-                    "\"" + self.actividadFrecuecia[line[9]] + "\", " + # P1700S3
-                    "\"" + self.actividadFrecuecia[line[10]] + "\"" + # P1700S4
-                    ");")
-                self.runQuery(query_insert)
-    
+        
     def runQuery(self, query):
         results = self.targetConnection.runQueryWithoutReturn(query)
-        self.targetConnection.commitChanges()
-    
-    
+        self.insertionCounter += 1
+        if self.insertionCounter == self.batchSize:
+            self.targetConnection.commitChanges()
+            self.insertionCounter = 0

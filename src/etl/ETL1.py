@@ -5,12 +5,13 @@ import numpy as np
 
 class ETL1:
     targetConnection: None
+    insertionCounter = 0
+    batchSize = 5000
 
     def __init__(self):
         self.targetConnection = TargetConnection()
     
     def startETL1(self):
-        self.crearTemporales()
         anio2012 = ["./Encuesta/2012/Tabla_de_viviendas/Tabla de vivendas.sav", 
                     [0,2,6,7,8,9,10,11,12,13], 
                     "./Encuesta/2012/Caracteristicas_generales/Características generales.sav", 
@@ -28,15 +29,13 @@ class ETL1:
                     "./Encuesta/2017/Caracteristicas_generales/Caracteristicas generales.sav", 
                     [0,2,5]]
         self.cargarTemporales(anio2012)
-        self.cargarTemporales(anio2014)
-        self.cargarTemporales(anio2016)
-        self.cargarTemporales(anio2017)
         self.cargarHogares("./Encuesta/2012/Tabla_de_hogares/Tabla de hogares.sav")
+        self.cargarTemporales(anio2014)
         self.cargarHogares("./Encuesta/2014/Hogares/HOGARES.sav")
+        self.cargarTemporales(anio2016)
         self.cargarHogares("./Encuesta/2016/Hogares/Hogares.sav")
+        self.cargarTemporales(anio2017)
         self.cargarHogares("./Encuesta/2017/Hogares/Hogares.sav")
-        
-        self.borrarTemporales()
     
     def crearTemporales(self):
         query_1 = 'CREATE TEMPORARY TABLE vivendas_temporal( id_vivienda INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Directorio VARCHAR(100), Region INT, P4000 INT, P4031S1 INT, P4031S1A1 INT, P4031S2 INT, P4031S3 INT, P4031S4 INT, P4031S4A1 INT, P4031S5 INT );'
@@ -53,6 +52,7 @@ class ETL1:
         self.runQuery(query_2)
 
     def cargarTemporales(self, params):
+        self.crearTemporales()
         with savReaderWriter.SavReader(params[0]) as reader:
             header = reader.header
             for line in reader:
@@ -126,7 +126,11 @@ class ETL1:
                 " );")
                 
                 self.runQuery(query) 
+        self.borrarTemporales()
     
     def runQuery(self, query):
         results = self.targetConnection.runQueryWithoutReturn(query)
-        self.targetConnection.commitChanges()
+        self.insertionCounter += 1
+        if self.insertionCounter == self.batchSize:
+            self.targetConnection.commitChanges()
+            self.insertionCounter = 0

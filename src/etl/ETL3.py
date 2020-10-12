@@ -5,12 +5,14 @@ import numpy as np
 
 class ETL3:
     targetConnection: None
+    insertionCounter = 0
+    batchSize = 1000
 
     def __init__(self):
         self.targetConnection = TargetConnection()
     
     def startETL3(self):
-        #self.cargarEncuestaPresentacionesEspectaculos()
+        self.cargarEncuestaPresentacionesEspectaculos()
         self.cargarEncuestaPresentacionesEspectaculosMenores12()
         
     def cargarEncuestaPresentacionesEspectaculos(self):
@@ -173,16 +175,16 @@ class ETL3:
             for line in reader:
                 line = list(map(lambda x: str(int(x)) if (x is not None and x != b'') else "Null" , line))
 
-                query_insert = ("INSERT INTO DIM_Encuesta_Presentaciones_Espectaculos_Menores " +
+                query_insert = ("INSERT INTO DIM_Encuesta_Presentaciones_Espectaculos " +
                     " ( DIRECTORIO, HOGAR_NUMERO, PERSONA_NUMERO, " + 
-                    "nino_asistio_teatro_danza, " +
-                    "nino_asistio_teatro_danza_frecuencia, " +
-                    "nino_asistio_concierto_recital, " +
-                    "nino_asistio_concierto_recital_frecuencia, " +
-                    "nino_asistio_expo_feria_arte_grafica, " +
-                    "nino_asistio_expo_feria_arte_grafica_frecuencia, " +
-                    "nino_asistio_expo_artesanal, " +
-                    "nino_asistio_expo_artesanal_frecuencia " +
+                    "asistio_teatro_danza, " +
+                    "asistio_teatro_danza_frecuencia, " +
+                    "asistio_concierto_recital, " +
+                    "asistio_concierto_recital_frecuencia, " +
+                    "asistio_expo_feria_arte_grafica, " +
+                    "asistio_expo_feria_arte_grafica_frecuencia, " +
+                    "asistio_expo_artesanal, " +
+                    "asistio_expo_artesanal_frecuencia " +
                     " ) " +
                     "values (" +
                     "\"" + line[0] + "\", " + # Directorio
@@ -200,7 +202,10 @@ class ETL3:
 
     def runQuery(self, query):
         results = self.targetConnection.runQueryWithoutReturn(query)
-        self.targetConnection.commitChanges()
+        self.insertionCounter += 1
+        if self.insertionCounter == self.batchSize:
+            self.targetConnection.commitChanges()
+            self.insertionCounter = 0
 
 
     
