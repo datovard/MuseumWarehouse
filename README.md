@@ -343,7 +343,7 @@ Las cuales complementan la tabla de hechos sumando datos importantes para los ob
 
 #### Diagrama
 
-![alt text](./misc/warehouse-model.png "Warehouse")
+![Diagrama](./misc/warehouse-model.png "Warehouse")
 
 ### 5. ETL's y llenado de datos
 

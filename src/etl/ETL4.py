@@ -104,11 +104,6 @@ class ETL4:
                 query_insert += str(params[4]) + ");"
                 
                 self.runQuery(query_insert)
-
-                '''counter += 1
-
-                if(counter == 100):
-                    break'''
         
         counter = 0
         searchIndexes = params[3]
@@ -125,12 +120,6 @@ class ETL4:
                     ";")
                 
                 self.runQuery(query_insert)
-                
-                '''counter += 1
-
-                if(counter == 100):
-                    break'''
-
         
     def runQuery(self, query):
         results = self.targetConnection.runQueryWithoutReturn(query)
