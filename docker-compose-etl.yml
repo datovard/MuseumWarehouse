@@ -1,9 +1,15 @@
 version: "3.7"
 services:
-  etl-runner:
+  etl-master:
     build:
-        dockerfile: ./config/docker/etl-runner.Dockerfile
-        context: .
+      dockerfile: ./config/docker/etl-runner.Dockerfile
+      context: .
+    image: etl-master
+  etl-runner:
+    image: etl-master
+    volumes:
+      - "./src:/src"
+    command: python index.py
 volumes:
   mysql-source-data:
   mysql-target-data:

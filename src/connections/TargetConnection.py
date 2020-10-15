@@ -48,5 +48,14 @@ class TargetConnection:
 
         return None
     
+    def runPreparedQueryWithoutReturn(self, query, params):
+        cursor = self.connection.cursor()
+
+        cursor.execute(query, params)
+
+        cursor.close()
+
+        return None
+    
     def commitChanges(self):
         self.connection.commit()
